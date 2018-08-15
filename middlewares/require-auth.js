@@ -19,6 +19,10 @@ module.exports = (req, res, next) => {
             return res.status(401).json({ error: 'No such user' });
         }
 
+        if (token !== user.accessToken) {
+            return res.status(401).json({ error: 'Invalid access token' });
+        }
+
         req.currentUser = username;
         next();
     });
