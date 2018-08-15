@@ -1,5 +1,6 @@
 const express = require('express');
 const Controller = require('./controller');
+const permission = require('../../../middlewares/check-permission');
 const requireAuth = require('../../../middlewares/require-auth');
 
 const router = express.Router();
@@ -52,6 +53,24 @@ const changePassword = async (req, res, next) => {
     }
 };
 
+const changeRole = async (req, res, next) => {
+    if (!req.adminRequest) {
+        return res.status(403).json({ error: 'No access permission' });
+    }
+
+    try {
+        const successful = await Controller.changeRole(req.params.username, req.body.role);
+        if (successful) {
+            res.status(200).json({ _updated: true })
+        }
+        else {
+            res.status(400).json({ _updated: false });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+
 const getPosts = async (req, res, next) => {
     try {
         const posts = await Controller.getPosts(req.params.username);
@@ -68,7 +87,8 @@ const getPosts = async (req, res, next) => {
 
 router.post('/signup', signUp);
 router.post('/signin', signIn);
-router.put('/:username/password', requireAuth, changePassword);
+router.put('/:username/password', requireAuth, permission.accountOwner, changePassword);
+router.put('/:username/role', requireAuth, permission.admin, changeRole);
 router.get('/:username/posts', getPosts);
 
 module.exports = router;

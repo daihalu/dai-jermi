@@ -1,6 +1,7 @@
 const User = require('./model');
 const bcrypt = require('bcrypt');
 const ObjectId = require('mongoose').Types.ObjectId;
+const { generateAccessToken } = require('./utils');
 
 exports.findUser = (username) => {
     return User.findOne({ username })
@@ -10,7 +11,7 @@ exports.findUser = (username) => {
 
 exports.createUser = (data) => {
     const { username, password } = data;
-    const user = new User({ username, password });
+    const user = new User({ username, password, role: 'user' });
     return user.save();
 };
 
@@ -29,6 +30,36 @@ exports.changePassword = (username, password) => {
             if (user) {
                 user.password = password;
                 return user.save();
+            }
+        })
+        .catch(err => console.log(err));
+};
+
+exports.changeRole = (username, role) => {
+    return User.findOne({ username })
+        .then(user => {
+            if (user) {
+                user.role = role;
+                user.accessToken = generateAccessToken({
+                    username: user.username,
+                    password: user.password,
+                    role
+                });
+                return user;
+            }
+        })
+        .then(user => {
+            if (user) {
+                return User.update(
+                        { username },
+                        { $set: { role: user.role, accessToken: user.accessToken }},
+                        { runValidators: true }
+                    )
+                    .exec()
+                    .then(res => {
+                        return res.nModified === 1;
+                    })
+                    .catch(err => console.log(err));
             }
         })
         .catch(err => console.log(err));

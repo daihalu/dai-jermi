@@ -5,6 +5,7 @@ const { generateAccessToken } = require('./utils');
 const userSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
+    role: { type: String, enum: ['admin', 'user'] },
     accessToken: String,
     posts: [{ _id: mongoose.Schema.Types.ObjectId }]
 });
@@ -15,7 +16,8 @@ userSchema.pre('save', function (next) {
             this.password = hash;
             this.accessToken = generateAccessToken({
                 username: this.username,
-                password: this.password
+                password: this.password,
+                role: this.role
             });
             next();
         })

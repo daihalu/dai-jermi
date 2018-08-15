@@ -4,6 +4,7 @@ const PostController = require('./controller');
 const UserController = require('../users/controller');
 const validate = require('../../../middlewares/validate');
 const cached = require('../../../middlewares/cached');
+const permission = require('../../../middlewares/check-permission');
 const requireAuth = require('../../../middlewares/require-auth');
 
 const router = express.Router();
@@ -60,6 +61,10 @@ const updatePost = async (req, res, next) => {
 };
 
 const approvePost = async (req, res, next) => {
+    if (!req.adminRequest) {
+        return res.status(403).json({ error: 'No access permission' });
+    }
+
     const { id } = req.params;
     try {
         const post = await PostController.approvePost(id, req.body.approval);
@@ -93,8 +98,8 @@ const deletePost = async (req, res, next) => {
 router.get('/', validate.getPosts, cached.getPosts, getPosts);
 router.get('/:id', cached.getPost, getPost);
 router.post('/', requireAuth, createPost);
-router.put('/:id', requireAuth, updatePost);
-router.put('/:id/approval', requireAuth, approvePost);
-router.delete('/:id', requireAuth, deletePost);
+router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
+router.put('/:id/approval', requireAuth, permission.admin, approvePost);
+router.delete('/:id', requireAuth, permission.admin, permission.postOwner, deletePost);
 
 module.exports = router;
