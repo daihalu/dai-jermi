@@ -7,7 +7,8 @@ const postSchema = new mongoose.Schema({
     content: String,
     _updatedDate: Date,
     _views: Number,
-    _estimatedReadTime: Number
+    _estimatedReadTime: Number,
+    _approved: Boolean
 });
 
 module.exports = mongoose.model('post', postSchema);

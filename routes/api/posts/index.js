@@ -2,6 +2,7 @@ const express = require('express');
 const Redis = require('../../../databases/redis');
 const PostController = require('./controller');
 const UserController = require('../users/controller');
+const validate = require('../../../middlewares/validate');
 const cached = require('../../../middlewares/cached');
 const requireAuth = require('../../../middlewares/require-auth');
 
@@ -58,6 +59,21 @@ const updatePost = async (req, res, next) => {
     }
 };
 
+const approvePost = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const post = await PostController.approvePost(id, req.body.approval);
+        if (post) {
+            res.status(200).json({ _updated: true, post });
+        }
+        else {
+            res.status(400).json({ _updated: false });
+        }
+    } catch (err) {
+        next(err);
+    }
+};
+
 const deletePost = async (req, res, next) => {
     const { id } = req.params;
     try {
@@ -74,10 +90,11 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', cached.getPosts, getPosts);
+router.get('/', validate.getPosts, cached.getPosts, getPosts);
 router.get('/:id', cached.getPost, getPost);
 router.post('/', requireAuth, createPost);
 router.put('/:id', requireAuth, updatePost);
+router.put('/:id/approval', requireAuth, approvePost);
 router.delete('/:id', requireAuth, deletePost);
 
 module.exports = router;

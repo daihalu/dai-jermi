@@ -9,6 +9,7 @@ exports.createFindConditions = (query) => {
     if (query.lastId) conditions._id = { $gt: req.lastId };
     if (query.author) conditions.author = query.author;
     if (query.category) conditions.category = query.category;
+    conditions._approved = query._approved;
     return conditions;
 };
 

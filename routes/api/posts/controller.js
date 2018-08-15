@@ -34,7 +34,8 @@ exports.createPost = (body) => {
         content,
         _updatedDate: new Date(),
         _views: 0,
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0
+        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0,
+        _approved: false
     });
     return post.save();
 };
@@ -50,6 +51,12 @@ exports.updatePost = (id, body) => {
         _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined
     });
     return Post.findByIdAndUpdate(id, changes, { new: true })
+        .lean()
+        .exec();
+};
+
+exports.approvePost = (id, approval) => {
+    return Post.findByIdAndUpdate(id, { _approved: approval }, { new: true })
         .lean()
         .exec();
 };
