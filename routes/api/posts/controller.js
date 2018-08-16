@@ -41,18 +41,29 @@ exports.createPost = (body) => {
 };
 
 exports.updatePost = (id, body) => {
-    const { title, category, content, _views } = body;
+    const { title, category, content } = body;
     const changes = removeFalsey({
         title,
         category,
         content,
         _updatedDate: new Date(),
-        _views,
         _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined
     });
     return Post.findByIdAndUpdate(id, changes, { new: true })
         .lean()
         .exec();
+};
+
+exports.increaseViews = (id) => {
+    return Post.findById(id, { _views: 1 })
+        .then(post => {
+            if (post) {
+                post._views = ++post._views;
+                post.save();
+                return post.toObject();
+            }
+        })
+        .catch(err => console.log(err));
 };
 
 exports.approvePost = (id, approval) => {

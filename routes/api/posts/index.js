@@ -6,6 +6,7 @@ const validate = require('../../../middlewares/validate');
 const cached = require('../../../middlewares/cached');
 const permission = require('../../../middlewares/check-permission');
 const requireAuth = require('../../../middlewares/require-auth');
+const increaseViews = require('../../../middlewares/increase-post-views');
 
 const router = express.Router();
 
@@ -20,11 +21,14 @@ const getPosts = async (req, res, next) => {
 };
 
 const getPost = async (req, res, next) => {
+    if (req.sentCache) return next();
+
     try {
         const post = await PostController.getPost(req.params.id);
         if (post) {
             await Redis.setex(req.key, 60, JSON.stringify(post));
             res.status(200).json({ _found: true, post });
+            next();
         }
         else {
             res.status(404).json({ _found: false });
@@ -96,7 +100,7 @@ const deletePost = async (req, res, next) => {
 };
 
 router.get('/', validate.getPosts, cached.getPosts, getPosts);
-router.get('/:id', cached.getPost, getPost);
+router.get('/:id', cached.getPost, getPost, increaseViews);
 router.post('/', requireAuth, createPost);
 router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);

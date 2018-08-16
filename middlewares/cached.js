@@ -20,9 +20,10 @@ exports.getPost = async (req, res, next) => {
     if (cachedPost) {
         const post = JSON.parse(cachedPost);
         res.status(200).json({ _found: true, post });
+        req.sentCache = true;
     }
     else {
         req.key = key;
-        next();
     }
+    next();
 };
