@@ -9,6 +9,11 @@ exports.createFindConditions = (query) => {
     if (query.lastId) conditions._id = { $gt: req.lastId };
     if (query.author) conditions.author = query.author;
     if (query.category) conditions.category = query.category;
+    if (query._updatedDate) {
+        const date = new Date(query._updatedDate);
+        const nextDate = new Date(query._updatedDate).setDate(date.getDate() + 1);
+        conditions._updatedDate = { $gte: date, $lt: nextDate };
+    }
     conditions._approved = query._approved;
     return conditions;
 };
