@@ -11,9 +11,9 @@ exports.getPosts = (query) => {
     const conditions = createFindConditions(query);
     const projection = createFindProjection(query);
     const sort = createSortConditions(query);
-    const pageSize = parseInt(query.pageSize) || 10;
     return Post.find(conditions, projection)
-        .limit(pageSize)
+        .limit(query.pageSize)
+        .skip((query.page - 1) * query.pageSize)
         .sort(sort)
         .lean()
         .exec();

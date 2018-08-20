@@ -6,7 +6,6 @@ exports.removeFalsey = (obj) => {
 
 exports.createFindConditions = (query) => {
     const conditions = {};
-    if (query.lastId) conditions._id = { $gt: req.lastId };
     if (query.author) conditions.author = query.author;
     if (query.category) conditions.category = query.category;
     if (query._updatedDate) {
