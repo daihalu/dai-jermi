@@ -20,6 +20,16 @@ const getPosts = async (req, res, next) => {
     }
 };
 
+const getPostTags = async (req, res, next) => {
+    try {
+        const tags = await PostController.getPostTags();
+        await Redis.setex('post-tags', 60 * 60, JSON.stringify(tags));
+        res.status(200).json({ _total: tags.length, tags });
+    } catch (err) {
+        next(err);
+    }
+};
+
 const getPost = async (req, res, next) => {
     if (req.sentCache) return next();
 
@@ -100,6 +110,7 @@ const deletePost = async (req, res, next) => {
 };
 
 router.get('/', validate.getPosts, cached.getPosts, getPosts);
+router.get('/tags', cached.getPostTags, getPostTags);
 router.get('/:id', cached.getPost, getPost, increaseViews);
 router.post('/', requireAuth, createPost);
 router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);

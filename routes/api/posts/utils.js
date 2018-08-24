@@ -8,6 +8,7 @@ exports.createFindConditions = (query) => {
     const conditions = {};
     if (query.author) conditions.author = query.author;
     if (query.category) conditions.category = query.category;
+    if (query.tag) conditions.tags = query.tag;
     if (query._updatedDate) {
         const date = new Date(query._updatedDate);
         const nextDate = new Date(query._updatedDate).setDate(date.getDate() + 1);

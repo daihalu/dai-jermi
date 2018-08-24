@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const Post = require('./model');
 const {
     removeFalsey,
@@ -19,6 +20,14 @@ exports.getPosts = (query) => {
         .exec();
 };
 
+exports.getPostTags = () => {
+    return Post.find({}, { tags: 1 })
+        .then(posts => {
+            const tags = posts.reduce((acc, cur) => [...acc, ...cur.tags], []);
+            return _.uniq(tags);
+        });
+};
+
 exports.getPost = (id) => {
     return Post.findById(id)
         .lean()
@@ -26,12 +35,13 @@ exports.getPost = (id) => {
 };
 
 exports.createPost = (body) => {
-    const { title, author, category, content } = body;
+    const { title, author, category, content, tags } = body;
     const post = new Post({
         title,
         author,
         category,
         content,
+        tags: tags ? tags.map(e => _.kebabCase(e)) : [],
         _updatedDate: new Date(),
         _views: 0,
         _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0,
@@ -41,11 +51,12 @@ exports.createPost = (body) => {
 };
 
 exports.updatePost = (id, body) => {
-    const { title, category, content } = body;
+    const { title, category, content, tags } = body;
     const changes = removeFalsey({
         title,
         category,
         content,
+        tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
         _updatedDate: new Date(),
         _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined
     });

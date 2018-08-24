@@ -14,6 +14,17 @@ exports.getPosts = async (req, res, next) => {
     }
 };
 
+exports.getPostTags = async (req, res, next) => {
+    const cachedTags = await Redis.get('post-tags');
+    if (cachedTags) {
+        const tags = JSON.parse(cachedTags);
+        res.status(200).json({ _total: tags.length, tags });
+    }
+    else {
+        next();
+    }
+};
+
 exports.getPost = async (req, res, next) => {
     const key = 'post:' + req.params.id;
     const cachedPost = await Redis.get(key);

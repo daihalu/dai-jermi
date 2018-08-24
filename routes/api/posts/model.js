@@ -5,6 +5,7 @@ const postSchema = new mongoose.Schema({
     author: String,
     category: String,
     content: String,
+    tags: [String],
     _updatedDate: Date,
     _views: Number,
     _estimatedReadTime: Number,
