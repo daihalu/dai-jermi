@@ -10,9 +10,12 @@ exports.createFindConditions = (query) => {
     if (query.category) conditions.category = query.category;
     if (query.tag) conditions.tags = query.tag;
     if (query._updatedDate) {
-        const date = new Date(query._updatedDate);
-        const nextDate = new Date(query._updatedDate).setDate(date.getDate() + 1);
-        conditions._updatedDate = { $gte: date, $lt: nextDate };
+        const timestamp = Date.parse(query._updatedDate);
+        if (!Number.isNaN(timestamp)) {
+            const date = new Date(timestamp);
+            const nextDate = new Date(timestamp + 86400000);
+            conditions._updatedDate = { $gte: date, $lt: nextDate };
+        }
     }
     conditions._approved = query._approved;
     return conditions;

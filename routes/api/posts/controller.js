@@ -25,6 +25,10 @@ exports.getPostTags = () => {
         .then(posts => {
             const tags = posts.reduce((acc, cur) => [...acc, ...cur.tags], []);
             return _.uniq(tags);
+        })
+        .catch(err => {
+            console.log(err);
+            return [];
         });
 };
 

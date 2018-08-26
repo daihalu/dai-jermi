@@ -31,8 +31,7 @@ exports.changePassword = (username, password) => {
                 user.password = password;
                 return user.save();
             }
-        })
-        .catch(err => console.log(err));
+        });
 };
 
 exports.changeRole = (username, role) => {
@@ -61,8 +60,7 @@ exports.changeRole = (username, role) => {
                     })
                     .catch(err => console.log(err));
             }
-        })
-        .catch(err => console.log(err));
+        });
 };
 
 exports.getPosts = (username) => {
@@ -89,7 +87,8 @@ exports.removePost = (username, id) => {
     return User.findOne({ username }, { posts: 1 })
         .then(user => {
             if (user) {
-                user.posts.shift(new ObjectId(id));
+                const index = user.posts.indexOf(new ObjectId(id));
+                user.posts.splice(index, 1);
                 User.update({ username }, { $set: { posts: user.posts }}).exec();
                 return user.posts;
             }
