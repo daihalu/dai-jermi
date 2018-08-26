@@ -1,12 +1,11 @@
 const express = require('express');
 const Redis = require('../../../databases/redis');
 const PostController = require('./controller');
-const UserController = require('../users/controller');
 const validate = require('../../../middlewares/validate');
 const cached = require('../../../middlewares/cached');
 const permission = require('../../../middlewares/check-permission');
+const postProcess = require('../../../middlewares/post-process');
 const requireAuth = require('../../../middlewares/require-auth');
-const increaseViews = require('../../../middlewares/increase-post-views');
 
 const router = express.Router();
 
@@ -52,8 +51,9 @@ const createPost = async (req, res, next) => {
     req.body.author = req.currentUser;
     try {
         const post = await PostController.createPost(req.body);
-        await UserController.addPost(req.currentUser, post._id);
         res.status(201).json({ post });
+        req.postId = post._id;
+        next();
     } catch (err) {
         next(err);
     }
@@ -98,8 +98,8 @@ const deletePost = async (req, res, next) => {
     try {
         const post = await PostController.deletePost(id);
         if (post) {
-            await UserController.removePost(req.currentUser, id);
             res.status(200).json({ _deleted: true, post });
+            next();
         }
         else {
             res.status(400).json({ _deleted: false });
@@ -111,10 +111,10 @@ const deletePost = async (req, res, next) => {
 
 router.get('/', validate.getPosts, cached.getPosts, getPosts);
 router.get('/tags', cached.getPostTags, getPostTags);
-router.get('/:id', cached.getPost, getPost, increaseViews);
-router.post('/', requireAuth, createPost);
+router.get('/:id', cached.getPost, getPost, postProcess.increaseViews);
+router.post('/', requireAuth, createPost, postProcess.addPostToUser);
 router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);
-router.delete('/:id', requireAuth, permission.admin, permission.postOwner, deletePost);
+router.delete('/:id', requireAuth, permission.admin, permission.postOwner, deletePost, postProcess.removePostFromUser);
 
 module.exports = router;
