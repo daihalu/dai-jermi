@@ -7,7 +7,6 @@ exports.removeFalsey = (obj) => {
 exports.createFindConditions = (query) => {
     const conditions = {};
     if (query.author) conditions.author = query.author;
-    if (query.category) conditions.category = query.category;
     if (query.tag) conditions.tags = query.tag;
     if (query._updatedDate) {
         const timestamp = Date.parse(query._updatedDate);

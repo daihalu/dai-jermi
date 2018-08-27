@@ -39,11 +39,10 @@ exports.getPost = (id) => {
 };
 
 exports.createPost = (body) => {
-    const { title, author, category, content, tags } = body;
+    const { title, author, content, tags } = body;
     const post = new Post({
         title,
         author,
-        category,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : [],
         _updatedDate: new Date(),
@@ -55,10 +54,9 @@ exports.createPost = (body) => {
 };
 
 exports.updatePost = (id, body) => {
-    const { title, category, content, tags } = body;
+    const { title, content, tags } = body;
     const changes = removeFalsey({
         title,
-        category,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
         _updatedDate: new Date(),
