@@ -1,5 +1,4 @@
 const express = require('express');
-const Redis = require('../../../databases/redis');
 const PostController = require('./controller');
 const validate = require('../../../middlewares/validate');
 const cached = require('../../../middlewares/cached');
@@ -12,8 +11,10 @@ const router = express.Router();
 const getPosts = async (req, res, next) => {
     try {
         const posts = await PostController.getPosts(req.query);
-        await Redis.setex(req.key, 60, JSON.stringify(posts));
         res.status(200).json({ _total: posts.length, posts });
+        req.expiresIn = 60;
+        req.data = posts;
+        next();
     } catch (err) {
         next(err);
     }
@@ -22,8 +23,10 @@ const getPosts = async (req, res, next) => {
 const getPostTags = async (req, res, next) => {
     try {
         const tags = await PostController.getPostTags();
-        await Redis.setex('post-tags', 60 * 60, JSON.stringify(tags));
         res.status(200).json({ _total: tags.length, tags });
+        req.expiresIn = 60 * 60;
+        req.data = tags;
+        next();
     } catch (err) {
         next(err);
     }
@@ -35,8 +38,9 @@ const getPost = async (req, res, next) => {
     try {
         const post = await PostController.getPost(req.params.id);
         if (post) {
-            await Redis.setex(req.key, 60, JSON.stringify(post));
             res.status(200).json({ _found: true, post });
+            req.expiresIn = 60;
+            req.data = post;
             next();
         }
         else {
@@ -109,9 +113,9 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', validate.getPosts, cached.getPosts, getPosts);
-router.get('/tags', cached.getPostTags, getPostTags);
-router.get('/:id', cached.getPost, getPost, postProcess.increaseViews);
+router.get('/', validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
+router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
+router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
 router.post('/', requireAuth, createPost, postProcess.addPostToUser);
 router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);
