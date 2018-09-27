@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const UserController = require('../routes/api/users/controller');
+const UserController = require('../routes/users/controller');
 const { JWT_SECRET } = require('../config');
 
 module.exports = (req, res, next) => {

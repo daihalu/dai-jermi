@@ -1,7 +1,9 @@
-const api = require('./api/index');
+const users = require('./users');
+const posts = require('./posts');
 
 module.exports = (app) => {
-    app.use('/api', api);
+    app.use('/users', users);
+    app.use('/posts', posts);
 
     app.use((err, req, res, next) => {
         console.log(err);

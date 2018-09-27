@@ -1,10 +1,10 @@
 const express = require('express');
 const PostController = require('./controller');
-const validate = require('../../../middlewares/validate');
-const cached = require('../../../middlewares/cached');
-const permission = require('../../../middlewares/check-permission');
-const postProcess = require('../../../middlewares/post-process');
-const requireAuth = require('../../../middlewares/require-auth');
+const validate = require('../../middlewares/validate');
+const cached = require('../../middlewares/cached');
+const permission = require('../../middlewares/check-permission');
+const postProcess = require('../../middlewares/post-process');
+const requireAuth = require('../../middlewares/require-auth');
 
 const router = express.Router();
 

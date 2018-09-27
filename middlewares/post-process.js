@@ -1,5 +1,5 @@
-const PostController = require('../routes/api/posts/controller');
-const UserController = require('../routes/api/users/controller');
+const PostController = require('../routes/posts/controller');
+const UserController = require('../routes/users/controller');
 
 exports.increaseViews = async (req, res, next) => {
     await PostController.increaseViews(req.params.id);
