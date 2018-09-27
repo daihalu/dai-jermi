@@ -3,11 +3,13 @@ const validateApproved = (_approved) => {
 };
 
 const validatePage = (page) => {
-    return (!parseInt(page) || parseInt(page) < 0) ? 1 : parseInt(page);
+    page = parseInt(page);
+    return (!page || page < 0) ? 1 : page;
 };
 
 const validatePageSize = (pageSize) => {
-    return (!parseInt(pageSize) || parseInt(pageSize) < 0) ? 10 : parseInt(pageSize);
+    pageSize = parseInt(pageSize);
+    return (!pageSize || pageSize < 0) ? 10 : pageSize;
 };
 
 exports.getPosts = (req, res, next) => {

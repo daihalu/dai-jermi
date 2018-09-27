@@ -1,5 +1,5 @@
 const express = require('express');
-const PostController = require('./controller');
+const Controller = require('./controller');
 const validate = require('../../middlewares/validate');
 const cached = require('../../middlewares/cached');
 const permission = require('../../middlewares/check-permission');
@@ -10,7 +10,7 @@ const router = express.Router();
 
 const getPosts = async (req, res, next) => {
     try {
-        const posts = await PostController.getPosts(req.query);
+        const posts = await Controller.getPosts(req.query);
         res.status(200).json({ _total: posts.length, posts });
         req.expiresIn = 60;
         req.data = posts;
@@ -22,7 +22,7 @@ const getPosts = async (req, res, next) => {
 
 const getPostTags = async (req, res, next) => {
     try {
-        const tags = await PostController.getPostTags();
+        const tags = await Controller.getPostTags();
         res.status(200).json({ _total: tags.length, tags });
         req.expiresIn = 60 * 60;
         req.data = tags;
@@ -36,15 +36,15 @@ const getPost = async (req, res, next) => {
     if (req.sentCache) return next();
 
     try {
-        const post = await PostController.getPost(req.params.id);
+        const post = await Controller.getPost(req.params.id);
         if (post) {
-            res.status(200).json({ _found: true, post });
+            res.status(200).json({ post });
             req.expiresIn = 60;
             req.data = post;
             next();
         }
         else {
-            res.status(404).json({ _found: false });
+            res.status(404).json({ post: {} });
         }
     } catch (err) {
         next(err);
@@ -54,7 +54,7 @@ const getPost = async (req, res, next) => {
 const createPost = async (req, res, next) => {
     req.body.author = req.currentUser;
     try {
-        const post = await PostController.createPost(req.body);
+        const post = await Controller.createPost(req.body);
         res.status(201).json({ post });
         req.postId = post._id;
         next();
@@ -66,7 +66,7 @@ const createPost = async (req, res, next) => {
 const updatePost = async (req, res, next) => {
     const { id } = req.params;
     try {
-        const post = await PostController.updatePost(id, req.body);
+        const post = await Controller.updatePost(id, req.body);
         if (post) {
             res.status(200).json({ _updated: true, post });
         }
@@ -85,7 +85,7 @@ const approvePost = async (req, res, next) => {
 
     const { id } = req.params;
     try {
-        const post = await PostController.approvePost(id, req.body.approval);
+        const post = await Controller.approvePost(id, req.body.approval);
         if (post) {
             res.status(200).json({ _updated: true, post });
         }
@@ -98,9 +98,13 @@ const approvePost = async (req, res, next) => {
 };
 
 const deletePost = async (req, res, next) => {
+    if (!req.adminRequest) {
+        return res.status(403).json({ error: 'No access permission' });
+    }
+
     const { id } = req.params;
     try {
-        const post = await PostController.deletePost(id);
+        const post = await Controller.deletePost(id);
         if (post) {
             res.status(200).json({ _deleted: true, post });
             next();
@@ -119,6 +123,6 @@ router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increa
 router.post('/', requireAuth, createPost, postProcess.addPostToUser);
 router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);
-router.delete('/:id', requireAuth, permission.admin, permission.postOwner, deletePost, postProcess.removePostFromUser);
+router.delete('/:id', requireAuth, permission.admin, deletePost, postProcess.removePostFromUser);
 
 module.exports = router;

@@ -5,10 +5,13 @@ const postSchema = new mongoose.Schema({
     author: String,
     content: String,
     tags: [String],
-    _updatedDate: Date,
+    _slug: String,
+    _createdAt: Date,
+    _updatedAt: Date,
     _views: Number,
     _estimatedReadTime: Number,
-    _approved: Boolean
+    _approved: Boolean,
+    __v: { type: Number, select: false }
 });
 
 module.exports = mongoose.model('post', postSchema);

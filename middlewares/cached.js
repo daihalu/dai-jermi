@@ -32,7 +32,7 @@ exports.getPost = async (req, res, next) => {
     const cachedPost = await Redis.get(key);
     if (cachedPost) {
         const post = JSON.parse(cachedPost);
-        res.status(200).json({ _found: true, post });
+        res.status(200).json({ post });
         req.sentCache = true;
     }
     else {
