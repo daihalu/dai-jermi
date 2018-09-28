@@ -66,6 +66,10 @@ const createPost = async (req, res, next) => {
 };
 
 const updatePost = async (req, res, next) => {
+    if (req.postApproved && !req.adminRequest) {
+        return res.status(403).json({ error: 'No access permission' });
+    }
+
     const { id } = req.params;
     try {
         const post = await Controller.updatePost(id, req.body);
@@ -124,7 +128,7 @@ router.get('/', validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
 router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
 router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
 router.post('/', requireAuth, createPost, postProcess.syncSlug, postProcess.addPostToUser);
-router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost, postProcess.syncSlug);
+router.put('/:id', requireAuth, validate.postApproval, permission.admin, permission.postOwner, updatePost, postProcess.syncSlug);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);
 router.delete('/:id', requireAuth, permission.admin, deletePost, postProcess.removePostFromUser);
 

@@ -1,3 +1,5 @@
+const PostController = require('../routes/posts/controller');
+
 const validateApproved = (approved) => {
     return approved === undefined ? true : (approved === 'true');
 };
@@ -20,5 +22,11 @@ exports.getPosts = (req, res, next) => {
     req.query.year     = parseInt(year);
     req.query.month    = parseInt(month);
     req.query.date     = parseInt(date);
+    next();
+};
+
+exports.postApproval = async (req, res, next) => {
+    const post = await PostController.getPost(req.params.id);
+    req.postApproved = post._approved;
     next();
 };
