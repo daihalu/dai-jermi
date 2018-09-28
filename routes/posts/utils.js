@@ -39,7 +39,7 @@ exports.parseConditions = (query) => {
 };
 
 exports.parseProjection = (query) => {
-    if (query.fields) return query.fields.split(',').join(' ');
+    if (query.fields) return '_slug ' + query.fields.split(',').join(' ');
 };
 
 exports.parseSort = (query) => {

@@ -5,6 +5,7 @@ const cached = require('../../middlewares/cached');
 const permission = require('../../middlewares/check-permission');
 const postProcess = require('../../middlewares/post-process');
 const requireAuth = require('../../middlewares/require-auth');
+const { hget } = require('../../databases/redis');
 
 const router = express.Router();
 
@@ -36,7 +37,8 @@ const getPost = async (req, res, next) => {
     if (req.sentCache) return next();
 
     try {
-        const post = await Controller.getPost(req.params.id);
+        const id = await hget('slugs', req.params.id) || req.params.id;
+        const post = await Controller.getPost(id);
         if (post) {
             res.status(200).json({ post });
             req.expiresIn = 60;
@@ -69,6 +71,7 @@ const updatePost = async (req, res, next) => {
         const post = await Controller.updatePost(id, req.body);
         if (post) {
             res.status(200).json({ _updated: true, post });
+            next();
         }
         else {
             res.status(400).json({ _updated: false });
@@ -120,8 +123,8 @@ const deletePost = async (req, res, next) => {
 router.get('/', validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
 router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
 router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
-router.post('/', requireAuth, createPost, postProcess.addPostToUser);
-router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost);
+router.post('/', requireAuth, createPost, postProcess.syncSlug, postProcess.addPostToUser);
+router.put('/:id', requireAuth, permission.admin, permission.postOwner, updatePost, postProcess.syncSlug);
 router.put('/:id/approval', requireAuth, permission.admin, approvePost);
 router.delete('/:id', requireAuth, permission.admin, deletePost, postProcess.removePostFromUser);
 

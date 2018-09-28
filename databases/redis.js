@@ -10,3 +10,7 @@ client.on('end', () => console.log('Redis disconnected'));
 
 exports.get = promisify(client.get).bind(client);
 exports.setex = promisify(client.setex).bind(client);
+exports.hget = promisify(client.hget).bind(client);
+exports.hmset = promisify(client.hmset).bind(client);
+exports.hlen = promisify(client.hlen).bind(client);
+exports.del = promisify(client.del).bind(client);

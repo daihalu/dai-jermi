@@ -7,6 +7,7 @@ const {
     parseSort,
     estimateReadTime
 } = require('./utils');
+const { slugify } = require('../../utils/string');
 
 exports.getPosts = (query) => {
     const conditions = parseConditions(query);
@@ -32,6 +33,12 @@ exports.getPostTags = () => {
         });
 };
 
+exports.getSlugs = () => {
+    return Post.find({}, { _slug: 1 })
+        .lean()
+        .exec();
+};
+
 exports.getPost = (id) => {
     return Post.findById(id)
         .lean()
@@ -45,9 +52,10 @@ exports.createPost = (body) => {
         author,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : [],
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0
+        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0,
+        _slug: title ? slugify(title) : undefined
     });
-    return post.save();
+    return post.save().then(p => p.toObject({ versionKey: false }));
 };
 
 exports.updatePost = (id, body) => {
@@ -57,7 +65,8 @@ exports.updatePost = (id, body) => {
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
         _updatedAt: new Date(),
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined
+        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined,
+        _slug: title ? slugify(title) : undefined
     });
     return Post.findByIdAndUpdate(id, changes, { new: true })
         .lean()
