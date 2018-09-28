@@ -1,12 +1,12 @@
-const { del, hmset, hlen } = require('../databases/redis');
+const Redis = require('../databases/redis');
 const { sortKeys } = require('./object');
 
-exports.saveHash = (source, dest) => {
+exports.replaceHash = (source, dest) => {
     return new Promise(async (resolve, reject) => {
         try {
-            await del(dest);
-            await hmset(dest, source);
-            const num = await hlen(dest);
+            await Redis.del(dest);
+            await Redis.hmset(dest, source);
+            const num = await Redis.hlen(dest);
             resolve(num);
         } catch (err) {
             reject(err);

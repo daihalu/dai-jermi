@@ -2,22 +2,22 @@ const PostController = require('../routes/posts/controller');
 const UserController = require('../routes/users/controller');
 const syncSlugs = require('../tasks/sync-slugs');
 
-exports.syncSlug = async (req, res, next) => {
+exports.syncSlugs = (req, res, next) => {
     syncSlugs();
     next();
 };
 
-exports.increaseViews = async (req, res, next) => {
-    await PostController.increaseViews(req.params.id);
+exports.increaseViews = (req, res, next) => {
+    PostController.increaseViews(req.postId);
     next();
 };
 
-exports.addPostToUser = async (req, res, next) => {
-    await UserController.addPost(req.currentUser, req.postId);
+exports.addPostToUser = (req, res, next) => {
+    UserController.addPost(req.currentUser, req.postId);
     next();
 };
 
-exports.removePostFromUser = async (req, res, next) => {
-    await UserController.removePost(req.currentUser, req.params.id);
+exports.removePostFromUser = (req, res, next) => {
+    UserController.removePost(req.currentUser, req.params.id);
     next();
 };

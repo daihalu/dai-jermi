@@ -28,7 +28,8 @@ exports.getPostTags = async (req, res, next) => {
 };
 
 exports.getPost = async (req, res, next) => {
-    const key = 'post:' + req.params.id;
+    const id = await Redis.hget('slugs', req.params.id) || req.params.id;
+    const key = 'post:' + id;
     const cachedPost = await Redis.get(key);
     if (cachedPost) {
         const post = JSON.parse(cachedPost);
@@ -38,11 +39,11 @@ exports.getPost = async (req, res, next) => {
     else {
         req.key = key;
     }
+    req.postId = id;
     next();
 };
 
 exports.saveCache = async (req, res, next) => {
-    if (req.sentCache) return next();
-    await Redis.setex(req.key, req.expiresIn, JSON.stringify(req.data));
+    if (!req.sentCache) Redis.setex(req.key, req.expiresIn, JSON.stringify(req.data));
     next();
 };
