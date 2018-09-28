@@ -2,16 +2,16 @@ const _ = require('lodash');
 const Post = require('./model');
 const {
     removeFalsey,
-    createFindConditions,
-    createFindProjection,
-    createSortConditions,
+    parseConditions,
+    parseProjection,
+    parseSort,
     estimateReadTime
 } = require('./utils');
 
 exports.getPosts = (query) => {
-    const conditions = createFindConditions(query);
-    const projection = createFindProjection(query);
-    const sort = createSortConditions(query);
+    const conditions = parseConditions(query);
+    const projection = parseProjection(query);
+    const sort = parseSort(query);
     return Post.find(conditions, projection)
         .limit(query.pageSize)
         .skip((query.page - 1) * query.pageSize)
@@ -45,10 +45,7 @@ exports.createPost = (body) => {
         author,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : [],
-        _updatedDate: new Date(),
-        _views: 0,
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0,
-        _approved: false
+        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0
     });
     return post.save();
 };
@@ -59,7 +56,7 @@ exports.updatePost = (id, body) => {
         title,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
-        _updatedDate: new Date(),
+        _updatedAt: new Date(),
         _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined
     });
     return Post.findByIdAndUpdate(id, changes, { new: true })

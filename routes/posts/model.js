@@ -6,11 +6,11 @@ const postSchema = new mongoose.Schema({
     content: String,
     tags: [String],
     _slug: String,
-    _createdAt: Date,
-    _updatedAt: Date,
-    _views: Number,
+    _createdAt: { type: Date, default: new Date() },
+    _updatedAt: { type: Date, default: new Date() },
+    _views: { type: Number, default: 0 },
     _estimatedReadTime: Number,
-    _approved: Boolean,
+    _approved: { type: Boolean, default: false },
     __v: { type: Number, select: false }
 });
 

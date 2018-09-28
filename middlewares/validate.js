@@ -1,5 +1,5 @@
-const validateApproved = (_approved) => {
-    return _approved === undefined ? true : (_approved === 'true');
+const validateApproved = (approved) => {
+    return approved === undefined ? true : (approved === 'true');
 };
 
 const validatePage = (page) => {
@@ -13,8 +13,12 @@ const validatePageSize = (pageSize) => {
 };
 
 exports.getPosts = (req, res, next) => {
-    req.query._approved = validateApproved(req.query._approved);
-    req.query.page = validatePage(req.query.page);
-    req.query.pageSize = validatePageSize(req.query.pageSize);
+    const { approved, page, pageSize, year, month, date } = req.query;
+    req.query.approved = validateApproved(approved);
+    req.query.page     = validatePage(page);
+    req.query.pageSize = validatePageSize(pageSize);
+    req.query.year     = parseInt(year);
+    req.query.month    = parseInt(month);
+    req.query.date     = parseInt(date);
     next();
 };

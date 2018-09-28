@@ -1,44 +1,57 @@
 const _ = require('lodash');
 
+const allowedSort = [
+    'newest',     'oldest',
+    'lastUpdate', '-lastUpdate',
+    'views',      '-views',
+    'readTime',   '-readTime'
+];
+
 exports.removeFalsey = (obj) => {
     return _.pickBy(obj, _.identity);
 };
 
-exports.createFindConditions = (query) => {
+exports.parseConditions = (query) => {
+    const { author, tag, year, month, date, approved } = query;
     const conditions = {};
-    if (query.author) conditions.author = query.author;
-    if (query.tag) conditions.tags = query.tag;
-    if (query._updatedDate) {
-        const timestamp = Date.parse(query._updatedDate);
-        if (!Number.isNaN(timestamp)) {
-            const date = new Date(timestamp);
-            const nextDate = new Date(timestamp + 86400000);
-            conditions._updatedDate = { $gte: date, $lt: nextDate };
-        }
+
+    if (author) conditions.author = author;
+    if (tag) conditions.tags = tag;
+
+    let lowerBound, upperBound;
+    if (year && month && date) {
+        lowerBound = new Date(year, month - 1, date);
+        upperBound = new Date(year, month - 1, date + 1);
     }
-    conditions._approved = query._approved;
+    else if (year && month) {
+        lowerBound = new Date(year, month - 1, 1);
+        upperBound = new Date(year, month, 1);
+    }
+    else if (year) {
+        lowerBound = new Date(year, 0, 1);
+        upperBound = new Date(year + 1, 0, 1);
+    }
+
+    if (lowerBound && upperBound) conditions._createdAt = { $gte: lowerBound, $lt: upperBound };
+    conditions._approved = approved;
+
     return conditions;
 };
 
-exports.createFindProjection = (query) => {
-    const projection = {};
-    const fields = query.fields ? query.fields.split(',') : [];
-    fields.forEach(field => projection[field] = 1);
-    return projection;
+exports.parseProjection = (query) => {
+    if (query.fields) return query.fields.split(',').join(' ');
 };
 
-exports.createSortConditions = (query) => {
-    const conditions = {};
-    const sorts = query.sort ? query.sort.split(',') : [];
-    sorts.forEach(sort => {
-        if (sort.charAt(0) === '-') {
-            conditions[sort.substring(1)] = -1;
-        }
-        else {
-            conditions[sort] = 1;
-        }
-    });
-    return conditions;
+exports.parseSort = (query) => {
+    if (query.sort) {
+        const sort = _.intersection(allowedSort, query.sort.split(','));
+        return sort.join(' ')
+            .replace('newest',     '-_createdAt')
+            .replace('oldest',     '_createdAt')
+            .replace('lastUpdate', '_updatedAt')
+            .replace('views',      '_views')
+            .replace('readTime',   '_estimatedReadTime');
+    }
 };
 
 exports.estimateReadTime = (numberOfWords) => {
