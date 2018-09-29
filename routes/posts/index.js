@@ -10,12 +10,15 @@ const postProcess = require('../../middlewares/post-process');
 const router = express.Router();
 
 const getPosts = async (req, res, next) => {
+    const { adminRequest } = req;
     try {
-        const posts = await Controller.getPosts(req.query);
+        const posts = await Controller.getPosts({ ...req.query, adminRequest });
         res.status(200).json({ _total: posts.length, posts });
-        req.expiresIn = 60;
-        req.data = posts;
-        next();
+        if (!adminRequest) {
+            req.expiresIn = 60;
+            req.data = posts;
+            next();
+        }
     } catch (err) {
         next(err);
     }
@@ -123,7 +126,7 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
+router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
 router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
 router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
 router.post('/', decodeToken, requireAuth, createPost, postProcess.syncSlugs, postProcess.addPostToUser);

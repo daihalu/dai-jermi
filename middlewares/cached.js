@@ -4,7 +4,7 @@ const { createKey } = require('../utils/redis');
 exports.getPosts = async (req, res, next) => {
     const key = createKey(req.query);
     const cachedPosts = await Redis.get(key);
-    if (cachedPosts) {
+    if (!req.adminRequest && cachedPosts) {
         const posts = JSON.parse(cachedPosts);
         res.status(200).json({ _total: posts.length, posts });
     }
