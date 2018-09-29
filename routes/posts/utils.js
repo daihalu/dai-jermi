@@ -32,7 +32,7 @@ exports.parseConditions = (query) => {
         upperBound = new Date(year + 1, 0, 1);
     }
 
-    if (lowerBound && upperBound) conditions._createdAt = { $gte: lowerBound, $lt: upperBound };
+    if (lowerBound && upperBound) conditions.createdAt = { $gte: lowerBound, $lt: upperBound };
     if (q) conditions.title = { $regex: q, $options: 'gi' };
 
     if (!adminRequest) conditions._approved = true;
@@ -48,11 +48,9 @@ exports.parseSort = (query) => {
     if (query.sort) {
         const sort = _.intersection(allowedSort, query.sort.split(','));
         return sort.join(' ')
-            .replace('newest',     '-_createdAt')
-            .replace('oldest',     '_createdAt')
-            .replace('lastUpdate', '_updatedAt')
-            .replace('views',      '_views')
-            .replace('readTime',   '_estimatedReadTime');
+            .replace('newest',     '-createdAt')
+            .replace('oldest',     'createdAt')
+            .replace('lastUpdate', '-updatedAt');
     }
 };
 

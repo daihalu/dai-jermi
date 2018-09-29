@@ -52,7 +52,7 @@ exports.createPost = (body) => {
         author,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : [],
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : 0,
+        readTime: content ? estimateReadTime(content.split(' ').length) : 0,
         _slug: title ? slugify(title) : undefined
     });
     return post.save().then(p => p.toObject({ versionKey: false }));
@@ -64,8 +64,8 @@ exports.updatePost = (id, body) => {
         title,
         content,
         tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
-        _updatedAt: new Date(),
-        _estimatedReadTime: content ? estimateReadTime(content.split(' ').length) : undefined,
+        readTime: content ? estimateReadTime(content.split(' ').length) : undefined,
+        updatedAt: new Date(),
         _slug: title ? slugify(title) : undefined
     });
     return Post.findByIdAndUpdate(id, changes, { new: true })
@@ -74,10 +74,10 @@ exports.updatePost = (id, body) => {
 };
 
 exports.increaseViews = (id) => {
-    return Post.findById(id, { _views: 1 })
+    return Post.findById(id, { views: 1 })
         .then(post => {
             if (post) {
-                post._views = ++post._views;
+                post.views = ++post.views;
                 post.save();
                 return post.toObject();
             }

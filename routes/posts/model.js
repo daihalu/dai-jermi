@@ -5,12 +5,12 @@ const postSchema = new mongoose.Schema({
     author: String,
     content: String,
     tags: [String],
-    _slug: String,
-    _createdAt: { type: Date, default: new Date() },
-    _updatedAt: { type: Date, default: new Date() },
-    _views: { type: Number, default: 0 },
-    _estimatedReadTime: Number,
+    views: { type: Number, default: 0 },
+    readTime: Number,
+    createdAt: { type: Date, default: new Date() },
+    updatedAt: { type: Date, default: new Date() },
     _approved: { type: Boolean, default: false },
+    _slug: String,
     __v: { type: Number, select: false }
 });
 
