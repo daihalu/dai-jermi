@@ -12,7 +12,7 @@ exports.removeFalsey = (obj) => {
 };
 
 exports.parseConditions = (query) => {
-    const { author, tag, year, month, date } = query;
+    const { author, tag, year, month, date, q } = query;
     const conditions = {};
 
     if (author) conditions.author = author;
@@ -33,6 +33,8 @@ exports.parseConditions = (query) => {
     }
 
     if (lowerBound && upperBound) conditions._createdAt = { $gte: lowerBound, $lt: upperBound };
+    if (q) conditions.title = { $regex: q, $options: 'gi' };
+
     conditions._approved = true;
 
     return conditions;
