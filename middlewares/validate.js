@@ -1,9 +1,5 @@
 const PostController = require('../routes/posts/controller');
 
-const validateApproved = (approved) => {
-    return approved === undefined ? true : (approved === 'true');
-};
-
 const validatePage = (page) => {
     page = parseInt(page);
     return (!page || page < 0) ? 1 : page;
@@ -15,8 +11,7 @@ const validatePageSize = (pageSize) => {
 };
 
 exports.getPosts = (req, res, next) => {
-    const { approved, page, pageSize, year, month, date } = req.query;
-    req.query.approved = validateApproved(approved);
+    const { page, pageSize, year, month, date } = req.query;
     req.query.page     = validatePage(page);
     req.query.pageSize = validatePageSize(pageSize);
     req.query.year     = parseInt(year);
