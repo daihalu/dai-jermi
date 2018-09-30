@@ -1,7 +1,8 @@
 const express = require('express');
 const Controller = require('./controller');
-const permission = require('../../middlewares/check-permission');
+const decodeToken = require('../../middlewares/decode-token');
 const requireAuth = require('../../middlewares/require-auth');
+const permission = require('../../middlewares/check-permission');
 
 const router = express.Router();
 
@@ -40,13 +41,25 @@ const signIn = async (req, res, next) => {
 };
 
 const changePassword = async (req, res, next) => {
+    const { username } = req.params;
+    const { oldPassword, newPassword } = req.body;
     try {
-        const user = await Controller.changePassword(req.params.username, req.body.password);
-        if (user) {
-            res.status(200).json({ accessToken: user.accessToken })
+        const user = await Controller.findUser(username);
+        if (!user) {
+            return res.status(400).json({ error: 'No such user' });
+        }
+
+        const isMatch = await Controller.comparePassword(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Incorrect password' });
+        }
+
+        const successful = await Controller.changePassword(username, newPassword);
+        if (successful) {
+            res.status(200).json({ accessToken: successful.accessToken })
         }
         else {
-            res.status(400).json({ error: 'Incorrect username' });
+            res.status(500).json({ error: 'Cannot change password' });
         }
     } catch (err) {
         next(err);
@@ -87,8 +100,8 @@ const getPosts = async (req, res, next) => {
 
 router.post('/signup', signUp);
 router.post('/signin', signIn);
-router.put('/:username/password', requireAuth, permission.accountOwner, changePassword);
-router.put('/:username/role', requireAuth, permission.admin, changeRole);
+router.put('/:username/password', decodeToken, requireAuth, permission.accountOwner, changePassword);
+router.put('/:username/role', decodeToken, requireAuth, permission.admin, changeRole);
 router.get('/:username/posts', getPosts);
 
 module.exports = router;

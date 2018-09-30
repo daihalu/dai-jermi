@@ -16,12 +16,7 @@ exports.createUser = (data) => {
 };
 
 exports.comparePassword = (plain, hashed) => {
-    return bcrypt.compare(plain, hashed)
-        .then(isMatch => isMatch)
-        .catch(err => {
-            console.log(err);
-            return false;
-        });
+    return bcrypt.compare(plain, hashed);
 };
 
 exports.changePassword = (username, password) => {
