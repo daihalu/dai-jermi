@@ -1,6 +1,5 @@
 const User = require('./model');
 const bcrypt = require('bcrypt');
-const ObjectId = require('mongoose').Types.ObjectId;
 const { generateAccessToken } = require('./utils');
 
 exports.findUser = (username) => {
@@ -56,37 +55,4 @@ exports.changeRole = (username, role) => {
                     .catch(err => console.log(err));
             }
         });
-};
-
-exports.getPosts = (username) => {
-    return User.findOne({ username }, { posts: 1 })
-        .then(user => {
-            if (user) return user.posts;
-        })
-        .catch(err => console.log(err));
-};
-
-exports.addPost = (username, id) => {
-    return User.findOne({ username }, { posts: 1 })
-        .then(user => {
-            if (user) {
-                user.posts.push(new ObjectId(id));
-                User.update({ username }, { $set: { posts: user.posts }}).exec();
-                return user.posts;
-            }
-        })
-        .catch(err => console.log(err));
-};
-
-exports.removePost = (username, id) => {
-    return User.findOne({ username }, { posts: 1 })
-        .then(user => {
-            if (user) {
-                const index = user.posts.indexOf(new ObjectId(id));
-                user.posts.splice(index, 1);
-                User.update({ username }, { $set: { posts: user.posts }}).exec();
-                return user.posts;
-            }
-        })
-        .catch(err => console.log(err));
 };

@@ -129,9 +129,9 @@ const deletePost = async (req, res, next) => {
 router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
 router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
 router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
-router.post('/', decodeToken, requireAuth, createPost, postProcess.syncSlugs, postProcess.addPostToUser);
+router.post('/', decodeToken, requireAuth, createPost, postProcess.syncSlugs);
 router.put('/:id', decodeToken, requireAuth, validate.postApproval, permission.admin, permission.postOwner, updatePost, postProcess.syncSlugs);
 router.put('/:id/approval', decodeToken, requireAuth, permission.admin, approvePost);
-router.delete('/:id', decodeToken, requireAuth, permission.admin, deletePost, postProcess.removePostFromUser);
+router.delete('/:id', decodeToken, requireAuth, permission.admin, deletePost);
 
 module.exports = router;

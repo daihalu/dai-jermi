@@ -84,24 +84,9 @@ const changeRole = async (req, res, next) => {
     }
 };
 
-const getPosts = async (req, res, next) => {
-    try {
-        const posts = await Controller.getPosts(req.params.username);
-        if (posts) {
-            res.status(200).json({ _total: posts.length, posts });
-        }
-        else {
-            res.status(404).json({ error: 'No such user' });
-        }
-    } catch (err) {
-        next(err);
-    }
-};
-
 router.post('/signup', signUp);
 router.post('/signin', signIn);
 router.put('/:username/password', decodeToken, requireAuth, permission.accountOwner, changePassword);
 router.put('/:username/role', decodeToken, requireAuth, permission.admin, changeRole);
-router.get('/:username/posts', getPosts);
 
 module.exports = router;

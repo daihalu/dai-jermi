@@ -6,8 +6,7 @@ const userSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
     role: { type: String, enum: ['admin', 'user'] },
-    accessToken: String,
-    posts: [{ _id: mongoose.Schema.Types.ObjectId }]
+    accessToken: String
 });
 
 userSchema.pre('save', function (next) {
