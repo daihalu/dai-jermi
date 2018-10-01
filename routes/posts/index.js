@@ -3,8 +3,8 @@ const Controller = require('./controller');
 const validate = require('../../middlewares/validate');
 const decodeToken = require('../../middlewares/decode-token');
 const requireAuth = require('../../middlewares/require-auth');
-const permission = require('../../middlewares/check-permission');
-const cached = require('../../middlewares/cached');
+const permission = require('../../middlewares/permission');
+const cache = require('../../middlewares/cache');
 const postProcess = require('../../middlewares/post-process');
 
 const router = express.Router();
@@ -126,9 +126,9 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cached.getPosts, getPosts, cached.saveCache);
-router.get('/tags', cached.getPostTags, getPostTags, cached.saveCache);
-router.get('/:id', cached.getPost, getPost, cached.saveCache, postProcess.increaseViews);
+router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cache.getPosts, getPosts, cache.saveCache);
+router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
+router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
 router.post('/', decodeToken, requireAuth, createPost, postProcess.syncSlugs);
 router.put('/:id', decodeToken, requireAuth, validate.postApproval, permission.admin, permission.postOwner, updatePost, postProcess.syncSlugs);
 router.put('/:id/approval', decodeToken, requireAuth, permission.admin, approvePost);

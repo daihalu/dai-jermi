@@ -1,12 +1,6 @@
 const _ = require('lodash');
 const Post = require('./model');
-const {
-    removeFalsey,
-    parseConditions,
-    parseProjection,
-    parseSort,
-    estimateReadTime
-} = require('./utils');
+const { removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime } = require('./utils');
 const { slugify } = require('../../utils/string');
 
 exports.getPosts = (query) => {
