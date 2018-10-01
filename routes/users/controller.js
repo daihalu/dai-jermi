@@ -43,7 +43,7 @@ exports.changeRole = (username, role) => {
         })
         .then(user => {
             if (user) {
-                return User.update(
+                return User.updateOne(
                         { username },
                         { $set: { role: user.role, accessToken: user.accessToken }},
                         { runValidators: true }
