@@ -8,7 +8,7 @@ module.exports = () => {
             post._slug,
             post._id.toString()
         ], []))
-        .then(slugs => replaceHash(slugs, 'slugs'))
+        .then(slugs => slugs.length > 0 ? replaceHash(slugs, 'slugs') : 0)
         .then(num => console.log('slugs synced:', num))
         .catch(err => console.log(err));
 };
