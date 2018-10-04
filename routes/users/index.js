@@ -67,10 +67,6 @@ const changePassword = async (req, res, next) => {
 };
 
 const changeRole = async (req, res, next) => {
-    if (!req.adminRequest) {
-        return res.status(403).json({ error: 'No access permission' });
-    }
-
     try {
         const successful = await Controller.changeRole(req.params.username, req.body.role);
         if (successful) {
@@ -86,7 +82,7 @@ const changeRole = async (req, res, next) => {
 
 router.post('/signup', signUp);
 router.post('/signin', signIn);
-router.put('/:username/password', decodeToken, requireAuth, permission.accountOwner, changePassword);
-router.put('/:username/role', decodeToken, requireAuth, permission.admin, changeRole);
+router.put('/:username/password', decodeToken, requireAuth, permission('accountOwner'), changePassword);
+router.put('/:username/role', decodeToken, requireAuth, permission('admin'), changeRole);
 
 module.exports = router;

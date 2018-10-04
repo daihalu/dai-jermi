@@ -1,37 +1,48 @@
-const UserController = require('../routes/users/controller');
+const PostController = require('../routes/posts/controller');
 
-exports.admin = (req, res, next) => {
+const checkAccountOwner = (req, res, next) => {
     const token = req.token;
-    if (token.err) {
-        return res.status(403).json({ error: 'No access permission' });
+    if (!token.err) {
+        const { username } = token.decoded;
+        if (username === req.params.username) return next();
     }
 
-    const { role } = token.decoded;
-    if (role === 'admin') req.adminRequest = true;
-    next();
+    res.status(403).json({ error: 'No access permission' });
 };
 
-exports.accountOwner = (req, res, next) => {
+const checkAdmin = (req, res, next) => {
     const token = req.token;
-    if (token.err) {
-        return res.status(403).json({ error: 'No access permission' });
+    if (!token.err) {
+        const { role } = token.decoded;
+        if (role === 'admin') return next();
     }
 
-    const { username } = token.decoded;
-    if (username !== req.params.username) {
-        return res.status(403).json({ error: 'No access permission' });
-    }
-    next();
+    res.status(403).json({ error: 'No access permission' });
 };
 
-exports.postOwner = async (req, res, next) => {
-    if (req.adminRequest) return next();
-    const posts = await UserController.getPosts(req.currentUser);
-    if (posts) {
-        const postIds = posts.map(e => e._id.toString());
-        if (!postIds.includes(req.params.id)) {
-            return res.status(403).json({ error: 'No access permission' });
-        }
+const checkAdminOrPostOwner = async (req, res, next) => {
+    const token = req.token;
+    if (!token.err) {
+        const { role, username } = token.decoded;
+        if (role === 'admin') return next();
+
+        const post = await PostController.getPost(req.params.id);
+        if (username === post.author) return next();
     }
-    next();
+
+    res.status(403).json({ error: 'No access permission' });
+};
+
+module.exports = (permissions) => {
+    if (!Array.isArray(permissions)) permissions = permissions.split(',');
+
+    if (permissions.includes('accountOwner')) {
+        return checkAccountOwner;
+    }
+    if (permissions.includes('admin') && permissions.includes('postOwner')) {
+        return checkAdminOrPostOwner;
+    }
+    if (permissions.includes('admin')) {
+        return checkAdmin;
+    }
 };

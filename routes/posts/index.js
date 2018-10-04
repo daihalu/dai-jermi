@@ -88,10 +88,6 @@ const updatePost = async (req, res, next) => {
 };
 
 const approvePost = async (req, res, next) => {
-    if (!req.adminRequest) {
-        return res.status(403).json({ error: 'No access permission' });
-    }
-
     const { id } = req.params;
     try {
         const post = await Controller.approvePost(id, req.body.approval);
@@ -107,10 +103,6 @@ const approvePost = async (req, res, next) => {
 };
 
 const deletePost = async (req, res, next) => {
-    if (!req.adminRequest) {
-        return res.status(403).json({ error: 'No access permission' });
-    }
-
     const { id } = req.params;
     try {
         const post = await Controller.deletePost(id);
@@ -130,8 +122,8 @@ router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cache.get
 router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
 router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
 router.post('/', decodeToken, requireAuth, createPost, postProcess.syncSlugs);
-router.put('/:id', decodeToken, requireAuth, validate.postApproval, permission.admin, permission.postOwner, updatePost, postProcess.syncSlugs);
-router.put('/:id/approval', decodeToken, requireAuth, permission.admin, approvePost);
-router.delete('/:id', decodeToken, requireAuth, permission.admin, deletePost);
+router.put('/:id', decodeToken, requireAuth, validate.postApproval, permission('admin,postOwner'), updatePost, postProcess.syncSlugs);
+router.put('/:id/approval', decodeToken, requireAuth, permission('admin'), approvePost);
+router.delete('/:id', decodeToken, requireAuth, permission('admin'), deletePost);
 
 module.exports = router;
