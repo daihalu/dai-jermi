@@ -4,10 +4,10 @@ const MongoDB = require('./databases/mongodb');
 const cors = require('cors');
 const routes = require('./routes');
 const runTasks = require('./tasks');
-const { PORT } = require('./config');
 
 const app = express();
 const server = http.createServer(app);
+const PORT = process.env.PORT;
 
 MongoDB.init();
 
