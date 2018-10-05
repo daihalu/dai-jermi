@@ -76,11 +76,11 @@ const updatePost = async (req, res, next) => {
     try {
         const post = await Controller.updatePost(id, req.body);
         if (post) {
-            res.status(200).json({ _updated: true, post });
+            res.status(200).json({ post });
             next();
         }
         else {
-            res.status(400).json({ _updated: false });
+            res.status(400).end();
         }
     } catch (err) {
         next(err);
@@ -91,12 +91,7 @@ const approvePost = async (req, res, next) => {
     const { id } = req.params;
     try {
         const post = await Controller.approvePost(id, req.body.approval);
-        if (post) {
-            res.status(200).json({ _updated: true, post });
-        }
-        else {
-            res.status(400).json({ _updated: false });
-        }
+        res.status(post ? 204 : 400).end();
     } catch (err) {
         next(err);
     }
@@ -106,13 +101,7 @@ const deletePost = async (req, res, next) => {
     const { id } = req.params;
     try {
         const post = await Controller.deletePost(id);
-        if (post) {
-            res.status(200).json({ _deleted: true, post });
-            next();
-        }
-        else {
-            res.status(400).json({ _deleted: false });
-        }
+        res.status(post ? 204 : 400).end();
     } catch (err) {
         next(err);
     }

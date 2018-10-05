@@ -14,7 +14,7 @@ const signUp = async (req, res, next) => {
         }
         else {
             const user = await Controller.createUser(req.body);
-            res.json({ username: user.username, accessToken: user.accessToken });
+            res.status(200).json({ username: user.username, accessToken: user.accessToken });
         }
     } catch (err) {
         next(err);
@@ -33,7 +33,7 @@ const signIn = async (req, res, next) => {
             res.status(401).json({ error: 'Incorrect password' });
         }
         else {
-            res.json({ username: user.username, accessToken: user.accessToken });
+            res.status(200).json({ username: user.username, accessToken: user.accessToken });
         }
     } catch (err) {
         next(err);
@@ -69,12 +69,7 @@ const changePassword = async (req, res, next) => {
 const changeRole = async (req, res, next) => {
     try {
         const successful = await Controller.changeRole(req.params.username, req.body.role);
-        if (successful) {
-            res.status(200).json({ _updated: true })
-        }
-        else {
-            res.status(400).json({ _updated: false });
-        }
+        res.status(successful ? 204 : 400).end();
     } catch (err) {
         next(err);
     }

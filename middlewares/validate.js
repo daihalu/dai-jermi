@@ -21,9 +21,13 @@ exports.getPosts = (req, res, next) => {
 };
 
 exports.postApproval = async (req, res, next) => {
-    const post = await PostController.getPost(req.params.id);
-    req.postApproved = post._approved;
-    next();
+    try {
+        const post = await PostController.getPost(req.params.id);
+        req.postApproved = post._approved;
+        next();
+    } catch (err) {
+        next(err);
+    }
 };
 
 exports.adminRequest = (req, res, next) => {
