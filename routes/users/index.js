@@ -3,6 +3,7 @@ const Controller = require('./controller');
 const decodeToken = require('../../middlewares/decode-token');
 const requireAuth = require('../../middlewares/require-auth');
 const permission = require('../../middlewares/permission');
+const validators = require('../../middlewares/validators');
 
 const router = express.Router();
 
@@ -75,9 +76,9 @@ const changeRole = async (req, res, next) => {
     }
 };
 
-router.post('/signup', signUp);
-router.post('/signin', signIn);
-router.put('/:username/password', decodeToken, requireAuth, permission('accountOwner'), changePassword);
-router.put('/:username/role', decodeToken, requireAuth, permission('admin'), changeRole);
+router.post('/signup', validators.signUpSignIn, signUp);
+router.post('/signin', validators.signUpSignIn, signIn);
+router.put('/:username/password', decodeToken, requireAuth, permission('accountOwner'), validators.changePassword, changePassword);
+router.put('/:username/role', decodeToken, requireAuth, permission('admin'), validators.changeRole, changeRole);
 
 module.exports = router;

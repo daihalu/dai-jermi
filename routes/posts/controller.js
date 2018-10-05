@@ -45,9 +45,9 @@ exports.createPost = (body) => {
         title,
         author,
         content,
-        tags: tags ? tags.map(e => _.kebabCase(e)) : [],
-        readTime: content ? estimateReadTime(content.split(' ').length) : 0,
-        _slug: title ? slugify(title) : undefined
+        tags,
+        readTime: estimateReadTime(content.split(' ').length),
+        _slug: slugify(title)
     });
     return post.save().then(p => p.toObject({ versionKey: false }));
 };
@@ -57,7 +57,7 @@ exports.updatePost = (id, body) => {
     const changes = removeFalsey({
         title,
         content,
-        tags: tags ? tags.map(e => _.kebabCase(e)) : undefined,
+        tags,
         readTime: content ? estimateReadTime(content.split(' ').length) : undefined,
         updatedAt: new Date(),
         _slug: title ? slugify(title) : undefined
