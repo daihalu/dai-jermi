@@ -27,7 +27,7 @@ const checkAdminOrPostOwner = async (req, res, next) => {
         if (role === 'admin') return next();
 
         const post = await PostController.getPost(req.params.id);
-        if (username === post.author) return next();
+        if (post && username === post.author) return next();
     }
 
     res.status(403).json({ error: 'No access permission' });

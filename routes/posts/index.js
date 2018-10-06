@@ -1,11 +1,11 @@
 const express = require('express');
 const Controller = require('./controller');
-const validate = require('../../middlewares/validate');
+const validators = require('../../middlewares/validators');
 const decodeToken = require('../../middlewares/decode-token');
 const requireAuth = require('../../middlewares/require-auth');
 const permission = require('../../middlewares/permission');
+const identify = require('../../middlewares/identify');
 const cache = require('../../middlewares/cache');
-const validators = require('../../middlewares/validators');
 const postProcess = require('../../middlewares/post-process');
 
 const router = express.Router();
@@ -108,12 +108,12 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', decodeToken, validate.adminRequest, validators.getPosts, cache.getPosts, getPosts, cache.saveCache);
+router.get('/', validators.getPosts, decodeToken, identify.adminRequest, cache.getPosts, getPosts, cache.saveCache);
 router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
 router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
-router.post('/', decodeToken, requireAuth, validators.createPost, createPost, postProcess.syncSlugs);
-router.put('/:id', decodeToken, requireAuth, validate.postApproval, permission('admin,postOwner'), validators.updatePost, updatePost, postProcess.syncSlugs);
-router.put('/:id/approval', decodeToken, requireAuth, permission('admin'), validators.approvePost, approvePost);
+router.post('/', validators.createPost, decodeToken, requireAuth, createPost, postProcess.syncSlugs);
+router.put('/:id', validators.updatePost, decodeToken, requireAuth, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, updatePost, postProcess.syncSlugs);
+router.put('/:id/approval', validators.approvePost, decodeToken, requireAuth, permission('admin'), approvePost);
 router.delete('/:id', decodeToken, requireAuth, permission('admin'), deletePost);
 
 module.exports = router;
