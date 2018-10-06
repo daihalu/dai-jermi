@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const { pickBy, identity, intersection } = require('lodash');
 
 const allowedSort = [
     'newest',     'oldest',
@@ -8,7 +8,7 @@ const allowedSort = [
 ];
 
 exports.removeFalsey = (obj) => {
-    return _.pickBy(obj, _.identity);
+    return pickBy(obj, identity);
 };
 
 exports.parseConditions = (query) => {
@@ -46,7 +46,7 @@ exports.parseProjection = (query) => {
 
 exports.parseSort = (query) => {
     if (query.sort) {
-        const sort = _.intersection(allowedSort, query.sort.split(','));
+        const sort = intersection(allowedSort, query.sort.split(','));
         return sort.join(' ')
             .replace('newest',     '-createdAt')
             .replace('oldest',     'createdAt')

@@ -12,7 +12,8 @@ const startingHyphens = /^-+/;
 const endingHyphens = /-+$/;
 
 const removeVietnameseAccents = (str) => {
-    return str.replace(a_VN, 'a')
+    return str
+        .replace(a_VN, 'a')
         .replace(e_VN, 'e')
         .replace(i_VN, 'i')
         .replace(o_VN, 'o')

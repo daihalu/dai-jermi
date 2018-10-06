@@ -3,9 +3,7 @@ const bcrypt = require('bcrypt');
 const { generateAccessToken } = require('./utils');
 
 exports.findUser = (username) => {
-    return User.findOne({ username })
-        .lean()
-        .exec();
+    return User.findOne({ username }).lean().exec();
 };
 
 exports.createUser = (data) => {

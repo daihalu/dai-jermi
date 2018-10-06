@@ -1,6 +1,10 @@
 const Redis = require('../databases/redis');
 const { sortKeys } = require('./object');
 
+exports.createKey = (query) => {
+    return 'posts:' + JSON.stringify(sortKeys(query));
+};
+
 exports.replaceHash = (source, dest) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -12,8 +16,4 @@ exports.replaceHash = (source, dest) => {
             reject(err);
         }
     });
-};
-
-exports.createKey = (query) => {
-    return 'posts:' + JSON.stringify(sortKeys(query));
 };

@@ -1,7 +1,7 @@
-const _ = require('lodash');
 const Post = require('./model');
 const { removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime } = require('./utils');
 const { slugify } = require('../../utils/string');
+const { uniq } = require('lodash');
 
 exports.getPosts = (query) => {
     const conditions = parseConditions(query);
@@ -19,7 +19,7 @@ exports.getPostTags = () => {
     return Post.find({}, { tags: 1 })
         .then(posts => {
             const tags = posts.reduce((acc, cur) => [...acc, ...cur.tags], []);
-            return _.uniq(tags);
+            return uniq(tags);
         })
         .catch(err => {
             console.log(err);
@@ -28,15 +28,11 @@ exports.getPostTags = () => {
 };
 
 exports.getSlugs = () => {
-    return Post.find({}, { _slug: 1 })
-        .lean()
-        .exec();
+    return Post.find({}, { _slug: 1 }).lean().exec();
 };
 
 exports.getPost = (id) => {
-    return Post.findById(id)
-        .lean()
-        .exec();
+    return Post.findById(id).lean().exec();
 };
 
 exports.createPost = (body) => {
@@ -62,9 +58,7 @@ exports.updatePost = (id, body) => {
         updatedAt: new Date(),
         _slug: title ? slugify(title) : undefined
     });
-    return Post.findByIdAndUpdate(id, changes, { new: true })
-        .lean()
-        .exec();
+    return Post.findByIdAndUpdate(id, changes, { new: true }).lean().exec();
 };
 
 exports.increaseViews = (id) => {
@@ -80,13 +74,9 @@ exports.increaseViews = (id) => {
 };
 
 exports.approvePost = (id, approval) => {
-    return Post.findByIdAndUpdate(id, { _approved: approval }, { new: true })
-        .lean()
-        .exec();
+    return Post.findByIdAndUpdate(id, { _approved: approval }, { new: true }).lean().exec();
 };
 
 exports.deletePost = (id) => {
-    return Post.findByIdAndDelete(id)
-        .lean()
-        .exec();
+    return Post.findByIdAndDelete(id).lean().exec();
 };

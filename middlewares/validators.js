@@ -75,7 +75,7 @@ const checkCreatePost = checkSchema({
         customSanitizer: {
             options: (values) => {
                 const isArray = Array.isArray(values);
-                return isArray ? values.split(' ').map(e => kebabCase(e)) : values;
+                return isArray ? values.map(e => kebabCase(e)) : values;
             }
         },
         custom: {
@@ -112,7 +112,7 @@ const checkUpdatePost = checkSchema({
         customSanitizer: {
             options: (values) => {
                 const isArray = Array.isArray(values);
-                return isArray ? values.split(' ').map(e => kebabCase(e)) : false;
+                return isArray ? values.map(e => kebabCase(e)) : false;
             }
         },
         custom: {
