@@ -108,7 +108,7 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-router.get('/', decodeToken, validate.adminRequest, validate.getPosts, cache.getPosts, getPosts, cache.saveCache);
+router.get('/', decodeToken, validate.adminRequest, validators.getPosts, cache.getPosts, getPosts, cache.saveCache);
 router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
 router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
 router.post('/', decodeToken, requireAuth, validators.createPost, createPost, postProcess.syncSlugs);

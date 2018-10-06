@@ -9,6 +9,50 @@ const catchErrors = (req, res, next) => {
     next();
 };
 
+const checkGetPosts = checkSchema({
+    page: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            options: { min: 1 },
+            errorMessage: 'must be greater than or equal to 1'
+        }
+    },
+    pageSize: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            options: { min: 1 },
+            errorMessage: 'must be greater than or equal to 1'
+        }
+    },
+    year: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            options: { min: 2018, max: new Date().getFullYear() },
+            errorMessage: 'is out of range'
+        }
+    },
+    month: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            options: { min: 1, max: 12 },
+            errorMessage: 'must be in range 1-12'
+        }
+
+    },
+    date: {
+        in: ['query'],
+        optional: true,
+        isInt: {
+            options: { min: 1, max: 31 },
+            errorMessage: 'must be in range 1-31'
+        }
+    }
+});
+
 const checkCreatePost = checkSchema({
     title: {
         in: ['body'],
@@ -46,15 +90,15 @@ const checkCreatePost = checkSchema({
 const checkUpdatePost = checkSchema({
     title: {
         in: ['body'],
-        custom: {
-            options: (value) => {
-                return value ? value.length >= 5 : true;
-            },
+        optional: true,
+        isLength: {
+            options: { min: 5 },
             errorMessage: 'must have at least 5 characters'
-        },
+        }
     },
     content: {
         in: ['body'],
+        optional: true,
         custom: {
             options: (value) => {
                 return value ? value.split(' ').length > 100 : true;
@@ -64,15 +108,16 @@ const checkUpdatePost = checkSchema({
     },
     tags: {
         in: ['body'],
+        optional: true,
         customSanitizer: {
             options: (values) => {
                 const isArray = Array.isArray(values);
-                return isArray ? values.split(' ').map(e => kebabCase(e)) : values;
+                return isArray ? values.split(' ').map(e => kebabCase(e)) : false;
             }
         },
         custom: {
             options: (values) => {
-                return values ? Array.isArray(values) : true;
+                return values ? Array.isArray(values) : false;
             },
             errorMessage: 'must be an array'
         }
@@ -131,6 +176,7 @@ const checkChangePassword = checkSchema({
 const checkChangeRole = body('role')
     .isIn(['admin', 'user']).withMessage('must be \'admin\' or \'user\'');
 
+exports.getPosts = [ checkGetPosts, catchErrors ];
 exports.createPost = [ checkCreatePost, catchErrors ];
 exports.updatePost = [ checkUpdatePost, catchErrors ];
 exports.approvePost = [ checkApprovePost, catchErrors ];
