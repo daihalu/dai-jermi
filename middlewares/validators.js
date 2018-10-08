@@ -1,5 +1,5 @@
 const { validationResult, checkSchema, body } = require('express-validator/check');
-const { pick, kebabCase } = require('lodash');
+const { pick } = require('lodash');
 
 const catchErrors = (req, res, next) => {
     const errors = validationResult(req);
@@ -72,12 +72,6 @@ const checkCreatePost = checkSchema({
     },
     tags: {
         in: ['body'],
-        customSanitizer: {
-            options: (values) => {
-                const isArray = Array.isArray(values);
-                return isArray ? values.map(e => kebabCase(e)) : values;
-            }
-        },
         custom: {
             options: (values) => {
                 return values ? Array.isArray(values) : false;
@@ -109,12 +103,6 @@ const checkUpdatePost = checkSchema({
     tags: {
         in: ['body'],
         optional: true,
-        customSanitizer: {
-            options: (values) => {
-                const isArray = Array.isArray(values);
-                return isArray ? values.map(e => kebabCase(e)) : false;
-            }
-        },
         custom: {
             options: (values) => {
                 return values ? Array.isArray(values) : false;

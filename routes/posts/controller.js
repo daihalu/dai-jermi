@@ -1,7 +1,7 @@
 const Post = require('./model');
 const { removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime } = require('./utils');
 const { slugify } = require('../../utils/string');
-const { uniq } = require('lodash');
+const { uniq, kebabCase } = require('lodash');
 
 exports.getPosts = (query) => {
     const conditions = parseConditions(query);
@@ -41,7 +41,7 @@ exports.createPost = (body) => {
         title,
         author,
         content,
-        tags,
+        tags: tags.map(e => kebabCase(e)),
         readTime: estimateReadTime(content.split(' ').length),
         _slug: slugify(title)
     });
@@ -53,7 +53,7 @@ exports.updatePost = (id, body) => {
     const changes = removeFalsey({
         title,
         content,
-        tags,
+        tags: tags ? tags.map(e => kebabCase(e)) : undefined,
         readTime: content ? estimateReadTime(content.split(' ').length) : undefined,
         updatedAt: new Date(),
         _slug: title ? slugify(title) : undefined
