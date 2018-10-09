@@ -12,6 +12,18 @@ exports.createUser = (data) => {
     return user.save();
 };
 
+exports.signUserIn = (user) => {
+    const accessToken = generateAccessToken({
+        username: user.username,
+        password: user.password,
+        role: user.role
+    });
+    return User.findByIdAndUpdate(user._id,
+        { $set: { accessToken }},
+        { new: true, runValidators: true }
+    ).exec();
+};
+
 exports.comparePassword = (plain, hashed) => {
     return bcrypt.compare(plain, hashed);
 };

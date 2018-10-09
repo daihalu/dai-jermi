@@ -34,7 +34,8 @@ const signIn = async (req, res, next) => {
             res.status(401).json({ error: 'Incorrect password' });
         }
         else {
-            res.status(200).json({ username: user.username, accessToken: user.accessToken });
+            const signedInUser = await Controller.signUserIn(user);
+            res.status(200).json({ username: user.username, accessToken: signedInUser.accessToken });
         }
     } catch (err) {
         next(err);
