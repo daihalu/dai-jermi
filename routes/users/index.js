@@ -56,9 +56,9 @@ const changePassword = async (req, res, next) => {
             return res.status(400).json({ error: 'Incorrect password' });
         }
 
-        const successful = await Controller.changePassword(username, newPassword);
-        if (successful) {
-            res.status(200).json({ accessToken: successful.accessToken })
+        const newUser = await Controller.changePassword(username, newPassword);
+        if (newUser) {
+            res.status(200).json({ accessToken: newUser.accessToken })
         }
         else {
             res.status(500).json({ error: 'Cannot change password' });
@@ -70,8 +70,18 @@ const changePassword = async (req, res, next) => {
 
 const changeRole = async (req, res, next) => {
     try {
-        const successful = await Controller.changeRole(req.params.username, req.body.role);
-        res.status(successful ? 204 : 400).end();
+        const user = await Controller.findUser(req.params.username);
+        if (!user) {
+            return res.status(400).json({ error: 'No such user' });
+        }
+
+        const newUser = await Controller.changeRole(user, req.body.role);
+        if (newUser) {
+            res.status(204).end();
+        }
+        else {
+            res.status(500).json({ error: 'Cannot change role' });
+        }
     } catch (err) {
         next(err);
     }
