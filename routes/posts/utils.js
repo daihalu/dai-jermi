@@ -50,7 +50,8 @@ exports.parseSort = (query) => {
         return sort.join(' ')
             .replace('newest',     '-createdAt')
             .replace('oldest',     'createdAt')
-            .replace('lastUpdate', '-updatedAt');
+            .replace('lastUpdate', '-updatedAt')
+            .replace('--', '');
     }
 };
 
