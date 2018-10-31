@@ -1,23 +1,24 @@
 {
   "name": "twodbros-server",
-  "version": "1.4.1",
+  "version": "1.4.2",
+  "scripts": {
+    "start": "NODE_ENV=production node server.js",
+    "devstart": "set NODE_ENV=development & nodemon server.js"
+  },
   "dependencies": {
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^3.0.2",
     "compression": "^1.7.3",
     "cors": "^2.8.4",
     "express": "^4.16.4",
     "express-validator": "^5.3.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
-    "mongoose": "^5.3.6",
-    "redis": "^2.8.0"
+    "mongoose": "^5.3.8",
+    "redis": "^2.8.0",
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "dotenv": "^6.1.0",
-    "nodemon": "^1.18.4"
-  },
-  "scripts": {
-    "start": "node index.js",
-    "devstart": "nodemon -r dotenv/config index.js"
+    "nodemon": "^1.18.5"
   }
 }

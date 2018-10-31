@@ -1,4 +1,4 @@
-const Redis = require('../databases/redis');
+const Redis = require('../config/db/redis');
 const { sortKeys } = require('./object');
 
 exports.createKey = (query) => {
