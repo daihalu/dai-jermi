@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const envConfig = require('../env');
-const logger = require('../log');
+const log = require('../log');
 
 mongoose.Promise = global.Promise;
 mongoose.set('useNewUrlParser', true);
@@ -16,6 +16,6 @@ const getUrl = (config) => {
 
 exports.init = () => {
     mongoose.connect(getUrl(envConfig))
-        .then(() => logger.info('MongoDB connected'))
-        .catch(err => logger.error(err));
+        .then(() => log.info('MongoDB connected'))
+        .catch(err => log.error(err));
 };

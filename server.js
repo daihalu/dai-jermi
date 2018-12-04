@@ -6,7 +6,7 @@ const compression = require('compression');
 const passport = require('./config/passport');
 const routes = require('./routes');
 const runTasks = require('./tasks');
-const logger = require('./config/log');
+const log = require('./config/log');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,4 +23,4 @@ passport(app);
 routes(app);
 runTasks();
 
-server.listen(PORT, () => logger.info(`server running on port ${PORT}`));
+server.listen(PORT, () => log.info(`server running on port ${PORT}`));

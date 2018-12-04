@@ -1,7 +1,7 @@
 const redis = require('redis');
 const { promisify } = require('util');
 const envConfig = require('../env');
-const logger = require('../log');
+const log = require('../log');
 
 const getUrl = (config) => {
     const { username, password, host, port } = config.database.redis;
@@ -12,8 +12,8 @@ const getUrl = (config) => {
 
 const client = redis.createClient({ url: getUrl(envConfig) });
 
-client.on('connect', () => logger.info('Redis connected'));
-client.on('error', (err) => logger.error(err));
+client.on('connect', () => log.info('Redis connected'));
+client.on('error', (err) => log.error(err));
 
 exports.del   = promisify(client.del).bind(client);
 exports.get   = promisify(client.get).bind(client);

@@ -2,7 +2,7 @@ const Post = require('./model');
 const { removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime } = require('./utils');
 const { slugify } = require('../../utils/string');
 const { uniq, kebabCase } = require('lodash');
-const logger = require('../../config/log');
+const log = require('../../config/log');
 
 exports.getPosts = (query) => {
     const conditions = parseConditions(query);
@@ -23,7 +23,7 @@ exports.getPostTags = () => {
             return uniq(tags);
         })
         .catch(err => {
-            logger.error(err);
+            log.error(err);
             return [];
         });
 };
@@ -71,7 +71,7 @@ exports.increaseViews = (id) => {
                 return post.toObject();
             }
         })
-        .catch(err => logger.error(err));
+        .catch(err => log.error(err));
 };
 
 exports.approvePost = (id, approval) => {
