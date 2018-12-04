@@ -1,4 +1,4 @@
 module.exports = {
-    environment: 'development',
-    logging: true
+  environment: 'development',
+  logging: true,
 };

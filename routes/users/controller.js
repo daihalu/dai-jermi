@@ -1,33 +1,28 @@
-const User = require('./model');
-const bcrypt = require('bcrypt');
+/* eslint-disable no-param-reassign */
 
-exports.findUser = (username) => {
-    return User.findOne({ username }).lean().exec();
-};
+const bcrypt = require('bcrypt');
+const User = require('./model');
+
+exports.findUser = username => User.findOne({ username }).lean().exec();
 
 exports.createUser = (data) => {
-    const { username, password } = data;
-    const user = new User({ username, password, role: 'user' });
-    return user.save();
+  const { username, password } = data;
+  const user = new User({ username, password, role: 'user' });
+  return user.save();
 };
 
-exports.comparePassword = (plain, hashed) => {
-    return bcrypt.compare(plain, hashed);
-};
+exports.comparePassword = (plain, hashed) => bcrypt.compare(plain, hashed);
 
-exports.changePassword = (user, password) => {
-    return User.findById(user._id)
-        .then(user => {
-            if (user) {
-                user.password = password;
-                return user.save();
-            }
-        });
-};
+exports.changePassword = (user, password) => User.findById(user._id)
+  .then((foundUser) => {
+    if (foundUser) {
+      foundUser.password = password;
+      return foundUser.save();
+    }
+  });
 
-exports.changeRole = (user, role) => {
-    return User.findByIdAndUpdate(user._id,
-        { $set: { role }},
-        { new: true, runValidators: true }
-    ).exec();
-};
+exports.changeRole = (user, role) => User.findByIdAndUpdate(
+  user._id,
+  { $set: { role } },
+  { new: true, runValidators: true },
+).exec();
