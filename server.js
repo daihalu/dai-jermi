@@ -3,6 +3,7 @@ const express = require('express');
 const MongoDB = require('./config/db/mongodb');
 const cors = require('cors');
 const compression = require('compression');
+const passport = require('./config/passport');
 const routes = require('./routes');
 const runTasks = require('./tasks');
 const logger = require('./config/log');
@@ -18,6 +19,7 @@ app.use(compression());
 app.use(express.json());
 app.disable('x-powered-by');
 
+passport(app);
 routes(app);
 runTasks();
 

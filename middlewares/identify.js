@@ -11,7 +11,6 @@ exports.approvedPost = async (req, res, next) => {
 };
 
 exports.adminRequest = (req, res, next) => {
-    const token = req.token;
-    req.adminRequest = token.decoded ? token.decoded.role === 'admin' : false;
+    req.adminRequest = req.user ? req.user.role === 'admin' : false;
     next();
 };

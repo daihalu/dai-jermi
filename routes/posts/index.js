@@ -1,8 +1,8 @@
 const express = require('express');
 const Controller = require('./controller');
 const validators = require('../../middlewares/validators');
+const authorize = require('../../middlewares/authorize');
 const decodeToken = require('../../middlewares/decode-token');
-const requireAuth = require('../../middlewares/require-auth');
 const permission = require('../../middlewares/permission');
 const identify = require('../../middlewares/identify');
 const cache = require('../../middlewares/cache');
@@ -57,7 +57,7 @@ const getPost = async (req, res, next) => {
 };
 
 const createPost = async (req, res, next) => {
-    req.body.author = req.currentUser;
+    req.body.author = req.user.username;
     try {
         const post = await Controller.createPost(req.body);
         res.status(201).json({ post });
@@ -111,9 +111,9 @@ const deletePost = async (req, res, next) => {
 router.get('/', validators.getPosts, decodeToken, identify.adminRequest, cache.getPosts, getPosts, cache.saveCache);
 router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
 router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
-router.post('/', validators.createPost, decodeToken, requireAuth, createPost, postProcess.syncSlugs);
-router.put('/:id', validators.updatePost, decodeToken, requireAuth, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, updatePost, postProcess.syncSlugs);
-router.put('/:id/approval', validators.approvePost, decodeToken, requireAuth, permission('admin'), approvePost);
-router.delete('/:id', decodeToken, requireAuth, permission('admin'), deletePost);
+router.post('/', validators.createPost, authorize, createPost, postProcess.syncSlugs);
+router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, updatePost, postProcess.syncSlugs);
+router.put('/:id/approval', validators.approvePost, authorize, permission('admin'), approvePost);
+router.delete('/:id', authorize, permission('admin'), deletePost);
 
 module.exports = router;
