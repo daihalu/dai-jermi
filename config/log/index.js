@@ -1,18 +1,28 @@
 /* eslint-disable no-param-reassign */
 
 const { createLogger, format, transports } = require('winston');
-const { logging } = require('../env');
+const { environment } = require('../env');
 
-const customFormat = format((info) => {
-  info[Symbol.for('message')] = `[${new Date().toISOString()}] ${info.level}: ${info.message}`;
-  return info;
+const { combine, timestamp, printf } = format;
+
+const customFormat = printf((info) => {
+  const log = info.level !== 'error'
+    ? `[${info.level}] ${info.timestamp}: ${info.message}`
+    : `[${info.level}] ${info.timestamp}: ${info.message}\n${info.stack}`;
+  return log.trim();
 });
+
+const customTransports = (() => {
+  if (environment === 'production') return [new transports.File({ filename: 'system.log' })];
+  if (environment === 'development') return [new transports.Console()];
+  return [];
+})();
 
 module.exports = createLogger({
   level: 'info',
-  format: customFormat(),
-  transports: [
-    new transports.Console(),
-  ],
-  silent: !logging,
+  format: combine(
+    timestamp(),
+    customFormat,
+  ),
+  transports: customTransports,
 });
