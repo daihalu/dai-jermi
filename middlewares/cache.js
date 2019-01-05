@@ -3,7 +3,7 @@ const { createKey } = require('../utils/redis');
 
 exports.getPosts = async (req, res, next) => {
   const key = createKey(req.query);
-  const cachedPosts = await Redis.get(key);
+  const cachedPosts = await Redis.getAsync(key);
   if (!req.adminRequest && cachedPosts) {
     const posts = JSON.parse(cachedPosts);
     res.status(200).json({ _total: posts.length, posts });
@@ -15,7 +15,7 @@ exports.getPosts = async (req, res, next) => {
 
 exports.getPostTags = async (req, res, next) => {
   const key = 'post-tags';
-  const cachedTags = await Redis.get(key);
+  const cachedTags = await Redis.getAsync(key);
   if (cachedTags) {
     const tags = JSON.parse(cachedTags);
     res.status(200).json({ _total: tags.length, tags });
@@ -26,9 +26,9 @@ exports.getPostTags = async (req, res, next) => {
 };
 
 exports.getPost = async (req, res, next) => {
-  const id = await Redis.hget('slugs', req.params.id) || req.params.id;
+  const id = await Redis.hgetAsync('slugs', req.params.id) || req.params.id;
   const key = `post:${id}`;
-  const cachedPost = await Redis.get(key);
+  const cachedPost = await Redis.getAsync(key);
   if (cachedPost) {
     const post = JSON.parse(cachedPost);
     res.status(200).json({ post });

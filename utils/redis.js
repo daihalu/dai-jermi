@@ -5,9 +5,9 @@ exports.createKey = query => `posts:${JSON.stringify(sortKeys(query))}`;
 
 exports.replaceHash = (source, dest) => new Promise(async (resolve, reject) => {
   try {
-    await Redis.del(dest);
-    await Redis.hmset(dest, source);
-    const num = await Redis.hlen(dest);
+    await Redis.delAsync(dest);
+    await Redis.hmsetAsync(dest, source);
+    const num = await Redis.hlenAsync(dest);
     resolve(num);
   } catch (err) {
     reject(err);
