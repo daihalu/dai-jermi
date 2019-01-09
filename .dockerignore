@@ -1,0 +1,35 @@
+# Docker directory files
+.docker/
+Dockerfile
+docker-compose.yml
+docker-compose.yaml
+.dockerignore
+
+# Dependency directory
+node_modules/
+
+# npm cache directory
+.npm/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# ESLint files
+.eslintrc*
+.eslintcache
+
+# environment variables file
+.env*
+
+# Documentation and license files
+*.md
+LICENSE
+
+# Git directory and files
+.git/
+.gitignore
+
+# Project directories
+.idea/
