@@ -1,31 +1,32 @@
-version: '3'
+version: "3.7"
 
 services:
-  tdb-server:
-    container_name: tdb-server
-    build: .
-    image: tdb-server:latest
-    ports:
-      - '3000:3000'
-    env_file: .env.production
-    networks:
-      - common
   mongodb:
     container_name: tdb-mongodb
     image: mongo:latest
-    ports:
-      - '3100:27017'
     volumes:
-      - './.docker/mongodb:/data/db'
+      - "${MONGODB_DIR}:/data/db"
+    env_file:
+      - ".env"
     networks:
       - common
   redis:
     container_name: tdb-redis
     image: redis:latest
+    networks:
+      - common
+  tdb-server:
+    container_name: tdb-server
+    build: "."
+    image: tdb-server:latest
     ports:
-      - '3200:6379'
-    volumes:
-      - './.docker/redis:/data/redis'
+      - "${PORT}:3000"
+    environment:
+      - NODE_ENV="production"
+      - MONGODB_URL="mongodb://tdb-mongodb:27017"
+      - REDIS_URI="redis://tdb-redis:6379"
+    env_file:
+      - ".env"
     networks:
       - common
 

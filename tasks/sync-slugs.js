@@ -1,6 +1,6 @@
 const PostController = require('../routes/posts/controller');
 const { replaceHash } = require('../utils/redis');
-const log = require('../config/log');
+const log = require('../configs/log');
 
 module.exports = () => {
   PostController.getSlugs()

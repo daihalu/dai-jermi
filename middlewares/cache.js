@@ -1,4 +1,4 @@
-const Redis = require('../config/db/redis');
+const Redis = require('../configs/db/redis');
 const { createKey } = require('../utils/redis');
 
 exports.getPosts = async (req, res, next) => {

@@ -2,7 +2,7 @@
 
 const users = require('./users');
 const posts = require('./posts');
-const log = require('../config/log');
+const log = require('../configs/log');
 
 module.exports = (app) => {
   app.use('/users', users);

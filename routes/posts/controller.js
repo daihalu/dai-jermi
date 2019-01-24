@@ -6,7 +6,7 @@ const {
   removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime,
 } = require('./utils');
 const { slugify } = require('../../utils/string');
-const log = require('../../config/log');
+const log = require('../../configs/log');
 
 exports.getPosts = (query) => {
   const conditions = parseConditions(query);

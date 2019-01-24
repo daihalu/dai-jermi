@@ -2,11 +2,11 @@ const http = require('http');
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
-const MongoDB = require('./config/db/mongodb');
-const passport = require('./config/passport');
+const MongoDB = require('./configs/db/mongodb');
+const passport = require('./configs/passport');
 const routes = require('./routes');
 const runTasks = require('./tasks');
-const log = require('./config/log');
+const log = require('./configs/log');
 
 const app = express();
 const server = http.createServer(app);

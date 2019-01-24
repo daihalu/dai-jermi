@@ -62,6 +62,3 @@ typings/
 
 # WebStorm .idea folder
 .idea/
-
-# Docker working folder
-.docker/

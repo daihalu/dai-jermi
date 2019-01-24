@@ -1,4 +1,4 @@
-const Redis = require('../config/db/redis');
+const Redis = require('../configs/db/redis');
 const { sortKeys } = require('./object');
 
 exports.createKey = query => `posts:${JSON.stringify(sortKeys(query))}`;

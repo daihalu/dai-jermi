@@ -1,19 +1,26 @@
-FROM node:lts
+# Stage 1: build dependencies
+FROM node:lts-alpine AS builds
 
-RUN mkdir /home/node/tdb-server && chown -R node:node /home/node/tdb-server
+WORKDIR /app
 
-WORKDIR /home/node/tdb-server
+RUN apk add --no-cache python make g++ && \
+    npm install -g node-gyp
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --production
+
+# Stage 2: final image
+FROM node:lts-alpine
+
+WORKDIR /app
+
+RUN npm install -g pm2
+
+COPY --from=builds /app/node_modules ./node_modules
 
 COPY . .
 
-COPY --chown=node:node . .
-
-USER node
-
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["pm2-runtime", "start", "server.js", "--name=\"twodbros-server\""]
