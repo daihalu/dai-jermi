@@ -1,30 +1,30 @@
 version: "3.7"
 
 services:
-  mongodb:
-    container_name: tdb-mongodb
+  jerni-mongodb:
+    container_name: jerni-mongodb
     image: mongo:latest
     volumes:
-      - "${MONGODB_DIR}:/data/db"
+      - "${MONGODB_DIR}:/var/lib/mongodb"
     env_file:
       - ".env"
     networks:
       - common
-  redis:
-    container_name: tdb-redis
+  jerni-redis:
+    container_name: jerni-redis
     image: redis:latest
     networks:
       - common
-  tdb-server:
-    container_name: tdb-server
-    build: "."
-    image: tdb-server:latest
+  jerni-api:
+    container_name: jerni-api
+    image: jerni-api:latest
     ports:
       - "${PORT}:3000"
     environment:
-      - NODE_ENV="production"
-      - MONGODB_URL="mongodb://tdb-mongodb:27017"
-      - REDIS_URI="redis://tdb-redis:6379"
+      - "NODE_ENV=production"
+      - "PORT=3000"
+      - "MONGODB_URI=mongodb://jerni-mongodb:27017"
+      - "REDIS_URI=redis://jerni-redis:6379"
     env_file:
       - ".env"
     networks:

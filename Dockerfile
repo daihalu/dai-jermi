@@ -11,7 +11,7 @@ COPY package*.json ./
 RUN npm install --production
 
 # Stage 2: final image
-FROM node:lts-alpine
+FROM node:lts-alpine AS final
 
 WORKDIR /app
 
@@ -23,4 +23,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["pm2-runtime", "start", "server.js", "--name=\"twodbros-server\""]
+CMD ["pm2-runtime", "start", "server.js", "--name=jerni-api"]
