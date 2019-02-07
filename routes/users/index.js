@@ -77,4 +77,9 @@ router.post('/signin', validators.signUpSignIn, authenticate, signIn);
 router.put('/:username/password', validators.changePassword, authorize, permission('accountOwner'), changePassword);
 router.put('/:username/role', validators.changeRole, authorize, permission('admin'), changeRole);
 
+router.all('/signup', (req, res) => res.status(405).end());
+router.all('/signin', (req, res) => res.status(405).end());
+router.all('/:username/password', (req, res) => res.status(405).end());
+router.all('/:username/role', (req, res) => res.status(405).end());
+
 module.exports = router;

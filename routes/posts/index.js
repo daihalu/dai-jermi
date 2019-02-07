@@ -30,8 +30,9 @@ const getPostTags = async (req, res, next) => {
 };
 
 const getPost = async (req, res, next) => {
+  const { adminRequest } = req;
   try {
-    const post = await Controller.getPost(req.postId, req.query);
+    const post = await Controller.getPost(req.postId, { ...req.query, adminRequest });
     if (post) {
       res.status(200).json({ post });
     } else {
@@ -92,10 +93,15 @@ const deletePost = async (req, res, next) => {
 
 router.get('/', validators.getPosts, decodeToken, identify.adminRequest, getPosts);
 router.get('/tags', getPostTags);
-router.get('/:id', lookupId, getPost, postProcess.increaseViews);
+router.get('/:id', decodeToken, identify.adminRequest, lookupId, getPost, postProcess.increaseViews);
 router.post('/', validators.createPost, authorize, createPost, postProcess.syncSlugs);
 router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, lookupId, updatePost, postProcess.syncSlugs);
 router.put('/:id/approval', validators.approvePost, authorize, permission('admin'), lookupId, approvePost);
 router.delete('/:id', authorize, permission('admin'), lookupId, deletePost);
+
+router.all('/', (req, res) => res.status(405).end());
+router.all('/tags', (req, res) => res.status(405).end());
+router.all('/:id', (req, res) => res.status(405).end());
+router.all('/:id/approval', (req, res) => res.status(405).end());
 
 module.exports = router;

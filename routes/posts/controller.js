@@ -39,8 +39,10 @@ exports.getPostTags = () => Post.find({}, { tags: 1 })
 exports.getSlugs = () => Post.find({}, { slug: 1 }).lean().exec();
 
 exports.getPost = (id, query) => {
+  const conditions = { _id: id };
+  if (!query.adminRequest) conditions.approved = true;
   const projection = query ? parseProjection(query) : undefined;
-  return Post.findById(id, projection).lean().exec();
+  return Post.findOne(conditions, projection).lean().exec();
 };
 
 exports.createPost = (body) => {
