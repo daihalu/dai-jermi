@@ -3,7 +3,7 @@ const PostController = require('../routes/posts/controller');
 exports.approvedPost = async (req, res, next) => {
   try {
     const post = await PostController.getPost(req.params.id);
-    req.postApproved = post._approved;
+    req.postApproved = post.approved;
     next();
   } catch (err) {
     next(err);

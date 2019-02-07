@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 
 const { createLogger, format, transports } = require('winston');
-const { environment } = require('../env');
 
 const { combine, timestamp, printf } = format;
 
@@ -13,8 +12,9 @@ const customFormat = printf((info) => {
 });
 
 const customTransports = (() => {
-  if (environment === 'production') return [new transports.File({ filename: 'system.log' })];
-  if (environment === 'development') return [new transports.Console()];
+  const env = process.env.NODE_ENV;
+  if (env === 'production') return [new transports.File({ filename: 'system.log' })];
+  if (env === 'development') return [new transports.Console()];
   return [];
 })();
 

@@ -61,6 +61,13 @@ const checkCreatePost = checkSchema({
       errorMessage: 'must have at least 5 characters',
     },
   },
+  intro: {
+    in: ['body'],
+    custom: {
+      options: value => value.split(' ').length > 10,
+      errorMessage: 'must contain at least 10 words',
+    },
+  },
   content: {
     in: ['body'],
     custom: {
@@ -84,6 +91,14 @@ const checkUpdatePost = checkSchema({
     isLength: {
       options: { min: 5 },
       errorMessage: 'must have at least 5 characters',
+    },
+  },
+  intro: {
+    in: ['body'],
+    optional: true,
+    custom: {
+      options: value => (value ? value.split(' ').length > 10 : true),
+      errorMessage: 'must contain at least 10 words',
     },
   },
   content: {

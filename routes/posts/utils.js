@@ -34,13 +34,13 @@ exports.parseConditions = (query) => {
   if (lowerBound && upperBound) conditions.createdAt = { $gte: lowerBound, $lt: upperBound };
   if (q) conditions.title = { $regex: q, $options: 'gi' };
 
-  if (!adminRequest) conditions._approved = true;
+  if (!adminRequest) conditions.approved = true;
 
   return conditions;
 };
 
 exports.parseProjection = (query) => {
-  if (query.fields) return `_slug ${query.fields.split(',').join(' ')}`;
+  if (query.fields) return `slug ${query.fields.split(',').join(' ')}`;
 };
 
 exports.parseSort = (query) => {
@@ -52,6 +52,15 @@ exports.parseSort = (query) => {
       .replace('lastUpdate', '-updatedAt')
       .replace('--', '');
   }
+};
+
+exports.parsePagination = (query) => {
+  const page = parseInt(query.page, 10);
+  const size = parseInt(query.pageSize, 10);
+  return {
+    page: (!page || page <= 0) ? 1 : page,
+    size: (!size || size <= 0) ? 10 : size,
+  };
 };
 
 exports.estimateReadTime = numberOfWords => Math.ceil(numberOfWords / 200);

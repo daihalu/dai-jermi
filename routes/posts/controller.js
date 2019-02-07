@@ -3,7 +3,12 @@
 const { uniq, kebabCase } = require('lodash');
 const Post = require('./model');
 const {
-  removeFalsey, parseConditions, parseProjection, parseSort, estimateReadTime,
+  removeFalsey,
+  parseConditions,
+  parseProjection,
+  parseSort,
+  parsePagination,
+  estimateReadTime,
 } = require('./utils');
 const { slugify } = require('../../utils/string');
 const log = require('../../configs/log');
@@ -12,9 +17,10 @@ exports.getPosts = (query) => {
   const conditions = parseConditions(query);
   const projection = parseProjection(query);
   const sort = parseSort(query);
+  const { page, size } = parsePagination(query);
   return Post.find(conditions, projection)
-    .limit(query.pageSize)
-    .skip((query.page - 1) * query.pageSize)
+    .limit(size)
+    .skip((page - 1) * size)
     .sort(sort)
     .lean()
     .exec();
@@ -30,34 +36,47 @@ exports.getPostTags = () => Post.find({}, { tags: 1 })
     return [];
   });
 
-exports.getSlugs = () => Post.find({}, { _slug: 1 }).lean().exec();
+exports.getSlugs = () => Post.find({}, { slug: 1 }).lean().exec();
 
-exports.getPost = id => Post.findById(id).lean().exec();
+exports.getPost = (id, query) => {
+  const projection = query ? parseProjection(query) : undefined;
+  return Post.findById(id, projection).lean().exec();
+};
 
 exports.createPost = (body) => {
   const {
-    title, author, content, tags,
+    title,
+    author,
+    intro,
+    content,
+    tags,
   } = body;
   const post = new Post({
     title,
     author,
+    intro,
     content,
     tags: tags.map(e => kebabCase(e)),
     readTime: estimateReadTime(content.split(' ').length),
-    _slug: slugify(title),
+    slug: slugify(title),
   });
-  return post.save().then(p => p.toObject({ versionKey: false }));
+  return post.save().then(p => p.toObject());
 };
 
 exports.updatePost = (id, body) => {
-  const { title, content, tags } = body;
+  const {
+    title,
+    intro,
+    content,
+    tags,
+  } = body;
   const changes = removeFalsey({
     title,
+    intro,
     content,
     tags: tags ? tags.map(e => kebabCase(e)) : undefined,
     readTime: content ? estimateReadTime(content.split(' ').length) : undefined,
-    updatedAt: new Date(),
-    _slug: title ? slugify(title) : undefined,
+    slug: title ? slugify(title) : undefined,
   });
   return Post.findByIdAndUpdate(id, changes, { new: true }).lean().exec();
 };
@@ -74,7 +93,7 @@ exports.increaseViews = id => Post.findById(id, { views: 1 })
 
 exports.approvePost = (id, approval) => Post.findByIdAndUpdate(
   id,
-  { _approved: approval },
+  { approved: approval },
   { new: true },
 ).lean().exec();
 

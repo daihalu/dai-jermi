@@ -3,15 +3,17 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
   title: String,
   author: String,
+  intro: String,
   content: String,
   tags: [String],
-  views: { type: Number, default: 0 },
   readTime: Number,
-  createdAt: { type: Date, default: new Date() },
-  updatedAt: { type: Date, default: new Date() },
-  _approved: { type: Boolean, default: false },
-  _slug: String,
+  views: { type: Number, min: 0, default: 0 },
+  approved: { type: Boolean, default: false },
+  slug: String,
   __v: { type: Number, select: false },
+}, {
+  timestamps: true,
+  toObject: { versionKey: false },
 });
 
 module.exports = mongoose.model('post', postSchema);

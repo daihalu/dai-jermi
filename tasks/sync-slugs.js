@@ -6,7 +6,7 @@ module.exports = () => {
   PostController.getSlugs()
     .then(posts => posts.reduce((previous, post) => [
       ...previous,
-      post._slug,
+      post.slug,
       post._id.toString(),
     ], []))
     .then(slugs => (slugs.length > 0 ? replaceHash(slugs, 'slugs') : 0))

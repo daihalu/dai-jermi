@@ -5,7 +5,7 @@ const authorize = require('../../middlewares/authorize');
 const decodeToken = require('../../middlewares/decode-token');
 const permission = require('../../middlewares/permission');
 const identify = require('../../middlewares/identify');
-const cache = require('../../middlewares/cache');
+const lookupId = require('../../middlewares/lookup-id');
 const postProcess = require('../../middlewares/post-process');
 
 const router = express.Router();
@@ -14,12 +14,7 @@ const getPosts = async (req, res, next) => {
   const { adminRequest } = req;
   try {
     const posts = await Controller.getPosts({ ...req.query, adminRequest });
-    res.status(200).json({ _total: posts.length, posts });
-    if (!adminRequest) {
-      req.expiresIn = 60;
-      req.data = posts;
-      next();
-    }
+    res.status(200).json({ total: posts.length, posts });
   } catch (err) {
     next(err);
   }
@@ -28,25 +23,17 @@ const getPosts = async (req, res, next) => {
 const getPostTags = async (req, res, next) => {
   try {
     const tags = await Controller.getPostTags();
-    res.status(200).json({ _total: tags.length, tags });
-    req.expiresIn = 60 * 60;
-    req.data = tags;
-    next();
+    res.status(200).json({ total: tags.length, tags });
   } catch (err) {
     next(err);
   }
 };
 
 const getPost = async (req, res, next) => {
-  if (req.sentCache) return next();
-
   try {
-    const post = await Controller.getPost(req.postId);
+    const post = await Controller.getPost(req.postId, req.query);
     if (post) {
       res.status(200).json({ post });
-      req.expiresIn = 60;
-      req.data = post;
-      next();
     } else {
       res.status(404).json({ post: {} });
     }
@@ -72,9 +59,8 @@ const updatePost = async (req, res, next) => {
     return res.status(403).json({ error: 'No access permission' });
   }
 
-  const { id } = req.params;
   try {
-    const post = await Controller.updatePost(id, req.body);
+    const post = await Controller.updatePost(req.postId, req.body);
     if (post) {
       res.status(200).json({ post });
       next();
@@ -87,9 +73,8 @@ const updatePost = async (req, res, next) => {
 };
 
 const approvePost = async (req, res, next) => {
-  const { id } = req.params;
   try {
-    const post = await Controller.approvePost(id, req.body.approval);
+    const post = await Controller.approvePost(req.postId, req.body.approval);
     res.status(post ? 204 : 400).end();
   } catch (err) {
     next(err);
@@ -97,21 +82,20 @@ const approvePost = async (req, res, next) => {
 };
 
 const deletePost = async (req, res, next) => {
-  const { id } = req.params;
   try {
-    const post = await Controller.deletePost(id);
+    const post = await Controller.deletePost(req.postId);
     res.status(post ? 204 : 400).end();
   } catch (err) {
     next(err);
   }
 };
 
-router.get('/', validators.getPosts, decodeToken, identify.adminRequest, cache.getPosts, getPosts, cache.saveCache);
-router.get('/tags', cache.getPostTags, getPostTags, cache.saveCache);
-router.get('/:id', cache.getPost, getPost, cache.saveCache, postProcess.increaseViews);
+router.get('/', validators.getPosts, decodeToken, identify.adminRequest, getPosts);
+router.get('/tags', getPostTags);
+router.get('/:id', lookupId, getPost, postProcess.increaseViews);
 router.post('/', validators.createPost, authorize, createPost, postProcess.syncSlugs);
-router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, updatePost, postProcess.syncSlugs);
-router.put('/:id/approval', validators.approvePost, authorize, permission('admin'), approvePost);
-router.delete('/:id', authorize, permission('admin'), deletePost);
+router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, lookupId, updatePost, postProcess.syncSlugs);
+router.put('/:id/approval', validators.approvePost, authorize, permission('admin'), lookupId, approvePost);
+router.delete('/:id', authorize, permission('admin'), lookupId, deletePost);
 
 module.exports = router;
