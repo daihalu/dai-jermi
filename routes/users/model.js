@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
   username: { type: String, unique: true },
   password: String,
-  role: { type: String, enum: ['admin', 'user'] },
+  role: { type: String, enum: ['admin', 'user'], default: 'user' },
 });
 
 userSchema.pre('save', function hashPassword(next) {

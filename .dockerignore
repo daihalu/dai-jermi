@@ -1,6 +1,6 @@
 # Docker files
 Dockerfile
-docker-compose.y*
+docker-compose.*ml
 .dockerignore
 
 # Dependency directory

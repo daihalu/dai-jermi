@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
   intro: String,
   content: String,
   tags: [String],
-  readTime: Number,
+  readTime: { type: Number, min: 1 },
   views: { type: Number, min: 0, default: 0 },
   slug: String,
   __v: { type: Number, select: false },

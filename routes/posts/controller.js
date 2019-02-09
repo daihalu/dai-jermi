@@ -47,11 +47,7 @@ exports.getPost = (id, query) => {
 
 exports.createPost = (body) => {
   const {
-    title,
-    author,
-    intro,
-    content,
-    tags,
+    title, author, intro, content, tags,
   } = body;
   const post = new Post({
     title,
@@ -67,10 +63,7 @@ exports.createPost = (body) => {
 
 exports.updatePost = (id, body) => {
   const {
-    title,
-    intro,
-    content,
-    tags,
+    title, intro, content, tags,
   } = body;
   const changes = removeFalsey({
     title,

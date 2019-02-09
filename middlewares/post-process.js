@@ -1,12 +1,12 @@
-const PostController = require('../routes/posts/controller');
-const syncSlugs = require('../tasks/sync-slugs');
+/* eslint-disable no-unused-vars */
 
-exports.syncSlugs = (req, res, next) => {
-  syncSlugs();
-  next();
+const PostController = require('../routes/posts/controller');
+const { sync } = require('../tasks/sync-slugs');
+
+exports.syncSlugs = (req, res) => {
+  sync();
 };
 
-exports.increaseViews = (req, res, next) => {
+exports.increaseViews = (req, res) => {
   PostController.increaseViews(req.postId);
-  next();
 };

@@ -1,4 +1,5 @@
 const PostController = require('../routes/posts/controller');
+const log = require('../configs/log');
 
 exports.publishedPost = async (req, res, next) => {
   try {
@@ -6,7 +7,8 @@ exports.publishedPost = async (req, res, next) => {
     req.postPublished = post.status === 'published';
     next();
   } catch (err) {
-    next(err);
+    log.error(err);
+    next();
   }
 };
 
