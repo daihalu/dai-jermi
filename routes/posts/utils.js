@@ -34,7 +34,7 @@ exports.parseConditions = (query) => {
   if (lowerBound && upperBound) conditions.createdAt = { $gte: lowerBound, $lt: upperBound };
   if (q) conditions.title = { $regex: q, $options: 'gi' };
 
-  if (!adminRequest) conditions.approved = true;
+  if (!adminRequest) conditions.status = 'published';
 
   return conditions;
 };

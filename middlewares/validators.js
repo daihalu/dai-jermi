@@ -64,8 +64,8 @@ const checkCreatePost = checkSchema({
   intro: {
     in: ['body'],
     custom: {
-      options: value => value.split(' ').length > 10,
-      errorMessage: 'must contain at least 10 words',
+      options: value => value.split(' ').length > 5,
+      errorMessage: 'must contain at least 5 words',
     },
   },
   content: {
@@ -97,8 +97,8 @@ const checkUpdatePost = checkSchema({
     in: ['body'],
     optional: true,
     custom: {
-      options: value => (value ? value.split(' ').length > 10 : true),
-      errorMessage: 'must contain at least 10 words',
+      options: value => (value ? value.split(' ').length > 5 : true),
+      errorMessage: 'must contain at least 5 words',
     },
   },
   content: {
@@ -119,8 +119,8 @@ const checkUpdatePost = checkSchema({
   },
 });
 
-const checkApprovePost = body('approval')
-  .isBoolean().withMessage('must be a boolean');
+const checkChangePostStatus = body('status')
+  .isIn(['editing', 'published']).withMessage('must be \'editing\' or \'published\'');
 
 const checkSignUpSignIn = checkSchema({
   username: {
@@ -174,7 +174,7 @@ const checkChangeRole = body('role')
 exports.getPosts = [checkGetPosts, catchErrors];
 exports.createPost = [checkCreatePost, catchErrors];
 exports.updatePost = [checkUpdatePost, catchErrors];
-exports.approvePost = [checkApprovePost, catchErrors];
+exports.changePostStatus = [checkChangePostStatus, catchErrors];
 exports.signUpSignIn = [checkSignUpSignIn, catchErrors];
 exports.changePassword = [checkChangePassword, catchErrors];
 exports.changeRole = [checkChangeRole, catchErrors];

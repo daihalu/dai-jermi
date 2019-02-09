@@ -26,7 +26,7 @@ exports.getPosts = (query) => {
     .exec();
 };
 
-exports.getPostTags = () => Post.find({}, { tags: 1 })
+exports.getPostTags = () => Post.find({}, 'tags')
   .then((posts) => {
     const tags = posts.reduce((acc, cur) => [...acc, ...cur.tags], []);
     return uniq(tags);
@@ -36,11 +36,11 @@ exports.getPostTags = () => Post.find({}, { tags: 1 })
     return [];
   });
 
-exports.getSlugs = () => Post.find({}, { slug: 1 }).lean().exec();
+exports.getSlugs = () => Post.find({}, 'slug').lean().exec();
 
 exports.getPost = (id, query) => {
   const conditions = { _id: id };
-  if (!query.adminRequest) conditions.approved = true;
+  if (query && !query.adminRequest) conditions.status = 'published';
   const projection = query ? parseProjection(query) : undefined;
   return Post.findOne(conditions, projection).lean().exec();
 };
@@ -83,7 +83,7 @@ exports.updatePost = (id, body) => {
   return Post.findByIdAndUpdate(id, changes, { new: true }).lean().exec();
 };
 
-exports.increaseViews = id => Post.findById(id, { views: 1 })
+exports.increaseViews = id => Post.findById(id, 'views')
   .then((post) => {
     if (post) {
       post.views += 1;
@@ -93,10 +93,14 @@ exports.increaseViews = id => Post.findById(id, { views: 1 })
   })
   .catch(err => log.error(err));
 
-exports.approvePost = (id, approval) => Post.findByIdAndUpdate(
+exports.changePostStatus = (id, status) => Post.findByIdAndUpdate(
   id,
-  { approved: approval },
-  { new: true },
+  { status },
+  { select: '_id' },
 ).lean().exec();
 
-exports.deletePost = id => Post.findByIdAndDelete(id).lean().exec();
+exports.deletePost = id => Post.findByIdAndUpdate(
+  id,
+  { status: 'deleted' },
+  { select: '_id' },
+).lean().exec();

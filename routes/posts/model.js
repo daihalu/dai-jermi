@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const postSchema = new mongoose.Schema({
+  status: { type: String, enum: ['editing', 'published', 'deleted'], default: 'editing' },
   title: String,
   author: String,
   intro: String,
@@ -8,7 +9,6 @@ const postSchema = new mongoose.Schema({
   tags: [String],
   readTime: Number,
   views: { type: Number, min: 0, default: 0 },
-  approved: { type: Boolean, default: false },
   slug: String,
   __v: { type: Number, select: false },
 }, {

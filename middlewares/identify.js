@@ -1,9 +1,9 @@
 const PostController = require('../routes/posts/controller');
 
-exports.approvedPost = async (req, res, next) => {
+exports.publishedPost = async (req, res, next) => {
   try {
     const post = await PostController.getPost(req.params.id);
-    req.postApproved = post.approved;
+    req.postPublished = post.status === 'published';
     next();
   } catch (err) {
     next(err);

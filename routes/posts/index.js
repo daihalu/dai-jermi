@@ -35,8 +35,9 @@ const getPost = async (req, res, next) => {
     const post = await Controller.getPost(req.postId, { ...req.query, adminRequest });
     if (post) {
       res.status(200).json({ post });
+      next();
     } else {
-      res.status(404).json({ post: {} });
+      res.status(404).end();
     }
   } catch (err) {
     next(err);
@@ -48,7 +49,6 @@ const createPost = async (req, res, next) => {
   try {
     const post = await Controller.createPost(req.body);
     res.status(201).json({ post });
-    req.postId = post._id;
     next();
   } catch (err) {
     next(err);
@@ -56,7 +56,7 @@ const createPost = async (req, res, next) => {
 };
 
 const updatePost = async (req, res, next) => {
-  if (req.postApproved && !req.adminRequest) {
+  if (req.postPublished && !req.adminRequest) {
     return res.status(403).json({ error: 'No access permission' });
   }
 
@@ -73,9 +73,9 @@ const updatePost = async (req, res, next) => {
   }
 };
 
-const approvePost = async (req, res, next) => {
+const changePostStatus = async (req, res, next) => {
   try {
-    const post = await Controller.approvePost(req.postId, req.body.approval);
+    const post = await Controller.changePostStatus(req.postId, req.body.status);
     res.status(post ? 204 : 400).end();
   } catch (err) {
     next(err);
@@ -95,13 +95,13 @@ router.get('/', validators.getPosts, decodeToken, identify.adminRequest, getPost
 router.get('/tags', getPostTags);
 router.get('/:id', decodeToken, identify.adminRequest, lookupId, getPost, postProcess.increaseViews);
 router.post('/', validators.createPost, authorize, createPost, postProcess.syncSlugs);
-router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.approvedPost, identify.adminRequest, lookupId, updatePost, postProcess.syncSlugs);
-router.put('/:id/approval', validators.approvePost, authorize, permission('admin'), lookupId, approvePost);
+router.put('/:id', validators.updatePost, authorize, permission('admin,postOwner'), identify.publishedPost, identify.adminRequest, lookupId, updatePost, postProcess.syncSlugs);
+router.put('/:id/status', validators.changePostStatus, authorize, permission('admin'), lookupId, changePostStatus);
 router.delete('/:id', authorize, permission('admin'), lookupId, deletePost);
 
 router.all('/', (req, res) => res.status(405).end());
 router.all('/tags', (req, res) => res.status(405).end());
 router.all('/:id', (req, res) => res.status(405).end());
-router.all('/:id/approval', (req, res) => res.status(405).end());
+router.all('/:id/status', (req, res) => res.status(405).end());
 
 module.exports = router;
