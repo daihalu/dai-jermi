@@ -9,9 +9,9 @@ module.exports = new Strategy({
   User.findOne({ username })
     .then(async (user) => {
       if (!user) {
-        done(null, false, { message: 'Incorrect username' });
+        done(null, false, { message: 'Incorrect username or password' });
       } else if (!await bcrypt.compare(password, user.password)) {
-        done(null, false, { message: 'Incorrect password' });
+        done(null, false, { message: 'Incorrect password or password' });
       } else {
         done(null, user);
       }
