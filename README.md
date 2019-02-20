@@ -12,6 +12,7 @@ Use a `.env` file or set variables in shell. Note: environment variables in shel
 - `MONGODB_DIR`: the path of a directory to store data in the host machine.
 - `JWT_SECRET`: a secret string used to sign access tokens.
 - `JWT_TTL`: time to live of access tokens ([zeit/ms](https://github.com/zeit/ms) time formats).
+- `SLUG_SYNC_INTERVAL`: time interval to sync slugs in ms.
 
 ### 3. Build Docker image
 Run:
@@ -39,4 +40,21 @@ docker load -i <path to the tar file>
 Run:
 ```
 docker-compose down
+```
+
+### 6. Develop (without Docker)
+Use a `.env.dev` file or set variables in shell.
+```
+NODE_ENV=development
+PORT=<custom port>
+MONGODB_URI=<local MongoDB URI>
+MONGODB_DBNAME=<local database name>
+REDIS_URI=<local Redis URI>
+JWT_SECRET=<secret string>
+JWT_TTL=<token's time to live>
+SLUG_SYNC_INTERVAL=<slug syncing interval>
+```
+Run:
+```
+npm run dev
 ```
